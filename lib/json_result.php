@@ -12,8 +12,12 @@ class JsonResult extends ActionResult {
 	}
 	
 	function render() {
-		e(json_encode($this->obj));
+		e($this->returnRender());
 	}	
+	
+	function returnRender() {
+		return json_encode($this->obj);
+	}
 };
 
 ?>

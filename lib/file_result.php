@@ -30,6 +30,9 @@ class FileResult extends ActionResult {
 		e($this->data);
 	}
 	
+	function returnRender() {
+		return $this->data;
+	}
 };
 
 ?>

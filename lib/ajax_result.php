@@ -24,6 +24,9 @@ class AjaxResult extends ActionResult {
 		}
 	}
 	
+	function returnRender() {
+		return $this->data;
+	}
 };
 
 ?>

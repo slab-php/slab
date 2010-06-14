@@ -14,10 +14,13 @@ class PartialResult extends ActionResult {
 	function render() {
 		$layoutName = $this->view->layoutName;
 		$this->view->layoutName = 'blank';
-		e($this->view->render());
+		e($this->returnRender());
 		$this->view->layoutName = $layoutName;
 	}
 	
+	function returnRender() {
+		return $this->view->render();
+	}
 };
 
 ?>

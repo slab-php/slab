@@ -16,6 +16,9 @@ class RedirectResult extends ActionResult {
 		header('Location: '.Dispatcher::url($this->url));
 	}
 	
+	function returnRender() {
+		return $this->url;
+	}
 };
 
 ?>

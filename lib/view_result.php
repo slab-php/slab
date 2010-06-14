@@ -12,9 +12,12 @@ class ViewResult extends ActionResult {
 	}
 	
 	function render() {
-		e($this->view->render());
+		e($this->returnRender());
 	}
 	
+	function returnRender() {
+		return $this->view->render();
+	}
 };
 
 ?>

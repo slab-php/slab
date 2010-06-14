@@ -5,9 +5,10 @@
 */
 
 class ActionResult extends Object {
-	// Subclasses of ActionResult that create output should override render()
+	// Subclasses of ActionResult that create output should override render() and returnRender()
 	function render() {}
-	
+	// renderToString() is intended when doing an inner dispatch and isn't always appropriate
+	function renderToString() { return ''; }
 };
 
 ?>

@@ -15,6 +15,9 @@ class TextResult extends ActionResult {
 		e($this->s);
 	}
 	
+	function returnRender() {
+		return $this->s;
+	}
 };
 
 ?>
