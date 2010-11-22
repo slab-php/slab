@@ -7,12 +7,42 @@
 
 class HtmlHelper extends Helper {
 	var $name = 'HtmlHelper';
+	
+	function select($name, $id, $options, $current = null) {
+		$s = '';
+		
+		foreach ($options as $k => $v) {
+			$s .= "<option value='{$k}'";
+			if (isset($current) && $k == $current) {
+				$s .= ' selected="selected" ';
+			}
+			$s .= ">{$v}</option>";
+		}
+		
+		return $this->__selectWrapper($name, $id, $s);;
+	}
+	
+	function selectIntFromRange($name, $id, $from, $to, $current) {
+		$s = '';
+		
+		for ($i = $from; $i < $to + 1; $i ++) {
+			$s .= "<option";
+			if ($i == $current) $s .= ' selected="selected" ';
+			$s .= ">{$i}</option>";
+		}
+		
+		return $this->__selectWrapper($name, $id, $s);
+	}
+	
+	function __selectWrapper($name, $id, $options) {
+		return "<select name=\"{$name}\" id=\"{$id}\">{$options}</select>";
+	}
+
 
 	// Wrapper for Dispatcher::url()
 	function url($u) {
 		return Dispatcher::url($u);
-	}
-	
+	}	
 	
 	// This is adapted from CodeIgniter
 	function headerStatus($code, $reason = null) {
@@ -31,20 +61,26 @@ class HtmlHelper extends Helper {
 			die();
 		}
 		
-		// CGI doesn't get the HTTP/1.X header
+		// CGI clients don't receive the HTTP/1.X header
 		if (substr(php_sapi_name(), 0, 3) == 'cgi') {
 			header('Status: '.$code.' '.$reason);
 			return;
 		}
 		
-		$serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : '';
-		if ($serverProtocol != 'HTTP/1.1' || $serverProtocol != 'HTTP/1.0') {
-			$serverProtocol = 'HTTP/1.1';
+		$serverProtocol = 'HTTP/1.1';
+		if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0') {
+			$serverProtocol = 'HTTP/1.0';
 		}
 		
 		header("$serverProtocol $code $reason", true, $code);
 	}
 
+	// Write the headers to trigger no-cache for IE (used by some AJAX-y View subclasses)
+	function headerNoCache() {
+		header('Cache-Control: no-cache');
+		header('Pragma: no-cache');
+		header('Expires: 0');
+	}
 
 	
 	// Copied from CodeIgniter

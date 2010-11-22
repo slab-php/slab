@@ -25,7 +25,7 @@ class Model extends Object {
 		if (empty($id)) {
 			$id = $this->id;
 		}
-		$this->$id = $id;
+		$this->id = $id;
 		
 		$result = $this->db->select(
 			$this->tableName,

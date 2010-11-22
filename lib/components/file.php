@@ -26,45 +26,43 @@ class FileComponent extends Component {
 		return file_exists($filename);
 	}
 
-	// Reads the file as text to a string. Returns false if the file doesn't exist or there is an error reading the file
-	function readText($filename) {
+	// Reads the file
+	function read($filename, $mode = 'rb') {
 		if (!$this->exists($filename)) {
-			return false;
+			throw new Exception('File does not exist');
 		}
 		
-		return file_get_contents($filename);
-	}
-	
-	// Reads the file as binary. Returns false if the file doesn't exist or there is an error reading the file
-	function readBinary($filename) {
-		if (!$this->exists($filename)) {
-			return false;
-		}
+		$handle = @fopen($filename, $mode);
+		if ($handle === FALSE) throw new Exception('File could not be opened. Please try again.');
 		
-		$f = fopen($filename, 'rb');
-		if (!$f) {
-			return false;
-		}
+		$size = filesize($filename);
+		if ($size == 0) throw new Exception('File has zero length. Please try again.');
 		
-		$data = fread($f, filesize($filename));
-		fclose($f);
+		$data = @fread($handle, $size);
+		if ($data === FALSE) throw new Exception('File could not be read. Please try again.');
+		
+		fclose($handle);
 		
 		return $data;
 	}
+	function readText($filename, $mode = 'rb') {
+		return $this->read($filename, $mode);
+	}
 	
-	// write a string to a file as text. Returns false or true to indicate success
-	function writeText($filename, $data, $mode = 'wb') {
+	// write a string to a file as text
+	function write($filename, $data, $mode = 'wb') {
 		$f = fopen($filename, $mode);
 		if (!$f) {
-			return false;
+			throw new Exception('Could not open file for writing');;
 		}
 		
 		flock($f, LOCK_EX);
 		fwrite($f, $data);
 		flock($f, LOCK_UN);
 		fclose($f);
-
-		return true;
+	}
+	function writeText($filename, $data, $mode = 'wb') {
+		$this->write($filename, $data, $mode);
 	}
 	
 	// Writes a serialized object to a file. If the Security component is available, encrypts the serialized object first. Read the object
@@ -74,13 +72,13 @@ class FileComponent extends Component {
 		if ($useEncryption && !empty($this->controller->Security)) {
 			$data = $this->controller->Security->encrypt($data);
 		}
-		return $this->writeText($filename, $data, $mode);
+		$this->write($filename, $data, $mode);
 	}
 	
 	// Reads a serialized object from a file. If the Security component is available, decrypts the serialized data before unserializing. Write the object
 	// with FileComponent::writeObject()
 	function readObject($filename, $useEncryption = true) {
-		$data = $this->readText($filename);
+		$data = $this->read($filename);
 		if ($useEncryption && !empty($this->controller->Security)) {
 			$data = $this->controller->Security->decrypt($data);
 		}

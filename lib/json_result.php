@@ -12,6 +12,8 @@ class JsonResult extends ActionResult {
 	}
 	
 	function render() {
+		$html =& Dispatcher::loadHelper('html');
+		$html->headerNoCache();
 		e($this->returnRender());
 	}	
 	

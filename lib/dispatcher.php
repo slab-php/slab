@@ -27,6 +27,10 @@ class Dispatcher extends Object {
 		global $Dispatcher_baseUrl;
 		return $Dispatcher_baseUrl;
 	}
+	
+	function getFilename($filename) {
+		return dirname(SLAB_ROOT).$filename;
+	}
 
 	// returns a working url for the given /c/a/p triad
 	// TODO: this will need to be extended for mod_rewrite support
@@ -90,7 +94,6 @@ $newUrl .= $Dispatcher_componentRefs['security']->encode($Dispatcher_componentRe
 	//static
 	function dispatch($cap = null, $data = null) {
 		// The first time this is called (by the bootstrapping file like /slab.php), $inDispatch is false.
-		
 		//if (self::$inDispatch) {
 		global $Dispatcher_inDispatch;
 		if ($Dispatcher_inDispatch) {
@@ -139,7 +142,7 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		if (strpos($cap, '/') === 0) {
 			$cap = substr($cap, 1);
 		}
-	
+
 		// Extract the controller name, action name, and parameters from the cap
 		$cap = explode('/', $cap);
 		if (count($cap) >= 1) {
@@ -328,7 +331,8 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		// make sure the method exists
 		$methods = array_flip($controller->methods);
 		if (!isset($methods[$actionName])) {
-			e('The <em>'.$actionName.'</em> action could not be found in the controller');
+			$controllerClass = get_class($controller);
+			e("The <em>{$actionName}</em> action could not be found in the <em>{$controllerClass}</em> controller");
 			die();
 		}
 	}

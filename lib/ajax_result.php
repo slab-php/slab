@@ -19,6 +19,7 @@ class AjaxResult extends ActionResult {
 	function render() {
 		$html =& Dispatcher::loadHelper('html');
 		$html->headerStatus($this->statusCode);
+		$html->headerNoCache();
 		if (!empty($this->data)) {
 			e($this->data);
 		}

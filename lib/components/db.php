@@ -7,7 +7,7 @@
 
 class DbComponent extends Component {
 	var $db = null;	// reference to a Database instance
-	
+
 	function init() {
 		// configure and connect the database
 		$this->db = null;

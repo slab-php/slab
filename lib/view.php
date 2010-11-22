@@ -22,6 +22,9 @@ class View extends Object {
 	}
 	
 	
+	function setView($viewName) { $this->viewName = $viewName; }
+	function setLayout($layoutName) { $this->layoutName = $layoutName; }
+	
 	function render() {
 		$this->__checkViewAndLayoutFilenames();
 		

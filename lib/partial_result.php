@@ -12,14 +12,16 @@ class PartialResult extends ActionResult {
 	}
 	
 	function render() {
-		$layoutName = $this->view->layoutName;
-		$this->view->layoutName = 'blank';
 		e($this->returnRender());
-		$this->view->layoutName = $layoutName;
 	}
 	
 	function returnRender() {
-		return $this->view->render();
+		$layoutName = $this->view->layoutName;
+		$this->view->layoutName = 'blank';		
+		$result = $this->view->render();		
+		$this->view->layoutName = $layoutName;
+		
+		return $result;
 	}
 };
 

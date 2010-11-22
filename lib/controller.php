@@ -58,17 +58,25 @@ class Controller extends Object {
 	
 	// These methods are used to generate the result of an action
 	// Eg: to redirect to another action: $this->redirect('/c/a/p');
-	// to render the default view: $this->render();
-	// to render a given view and layout: $this->render('another_view', 'another_layout');
-	// to render a view to a blank layout (partial view in ASP.NET MVC parlance): $this->renderPartial();
+	// to render the default view (this is done by default): $this->render();
+	// to render a given view: $this->view('/controller/view')
+	// to render a given view and layout: $this->view('/controller/view', 'another_layout');
+	// to render a view to a blank layout (partial view): $this->renderPartial();
 	// to return some JSON: $this->json($model);
 	// to return plain text: $this->text('a string');
-	// to write a buffer as an inline file: $this->renderFileInline($filename, $data);
-	// to write a file as an attachment: $this->renderFileAttachment($filename, $data);
+	// to write a buffer as an inline file: $this->file($filename, $data); (or fileInline())
+	// to write a file as an attachment: $this->fileAttachment($filename, $data);
 	// to write a 200 OK response: $this->ajaxSuccess()
 	// or a 500 internal error: $this->ajaxFailure()
+	// or a 404 file not found: $this->fileNotFound()
 	
-	function view() {
+	function view($view = null, $layout = null) {
+		if (isset($view)) {
+			$this->view->setView($view);
+		}
+		if (isset($layout)) {
+			$this->view->setLayout($layout);
+		}
 		$this->actionResult = new ViewResult($this->view);
 	}	
 	function partial() {
@@ -105,6 +113,9 @@ class Controller extends Object {
 	}
 	function ajaxError($data = null) {
 		$this->ajaxFailure($data);
+	}
+	function fileNotFound() {
+		$this->actionResult = new AjaxResult(404, null);
 	}
 	// excute another action and use the result of that action for this action (nested dispatch)
 	function action($cap, $data = null) {

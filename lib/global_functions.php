@@ -43,11 +43,14 @@ function pr($v) {
 }
 
 // Alias for strtolower/upper
-// I know it's only 1 letter shorter but it's easier for me to remember ;-)
 function lowercase($s) { return strtolower($s); }
 function uppercase($s) { return strtoupper($s); }
 function toLower($s) { return strtolower($s); }
 function toUpper($s) { return strtoupper($s); }
+function uc($s) { return strtoupper($s); }
+function lc($s) { return strtolower($s); }
+function up($s) { return strtoupper($s); }
+function low($s) { return strtolower($s); }
 
 // Returns if a given string $source contains the specified search string $search
 // If $search is an array, returns true if any of the items in $search is contained in $source
@@ -331,6 +334,7 @@ $mimeTypes = array(
 
 // json_encode doesn't exist in < PHP 5.2, so...
 // Adapted from http://au.php.net/manual/en/function.json-encode.php#82904
+// *************************************************************************** This could be dropped as I'm not targeting PHP < 5.2 now
 if (!function_exists('json_encode')) {
   function json_encode($a = false) {
     if (is_null($a)) {
@@ -375,6 +379,28 @@ if (!function_exists('json_encode')) {
       return '{' . join(',', $result) . '}';
     }
   }
+}
+
+// Adapted from http://www.php.net/manual/en/function.hexdec.php#99478
+// Method to convert a hex color string to an array of (r,g,b),
+// eg hex2rgb('#050505') == array(5,5,5),
+// hex2rgb('#fff') == array(255,255,255)
+function hex2rgb($hex) {
+	$hex = preg_replace("/[^0-9A-Fa-f]/", '', $hex);
+	if (strlen($hex) == 6) {
+		$val = hexdec($hex);
+		return array(
+			0xff & ($val >> 0x10),
+			0xff & ($val >> 0x8),
+			0xff & $val
+		);
+	} else if (strlen($hex) == 3) {
+		return array(
+			hexdec(str_repeat(substr($hex, 0, 1), 2)),
+			hexdec(str_repeat(substr($hex, 1, 1), 2)),
+			hexdec(str_repeat(substr($hex, 2, 1), 2))
+		);
+	} else throw new Exception("Invalid hex color string");
 }
 
 ?>
