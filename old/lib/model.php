@@ -1,8 +1,6 @@
 <?php
 /* Model
 ** Base class for models, or used as is if a model isn't defined in the app
-** BJS20091004
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
 */
 
 class Model extends Object {
@@ -16,6 +14,17 @@ class Model extends Object {
 
 	function getLastError() {
 		return $this->db->getLastError();
+	}
+	
+	function create() {
+		$model = array();
+		foreach ($this->schema as $col => $colSchema) {
+			if (!isset($colSchema['default'])) continue;
+			$model[$col] = $colSchema['default'];
+		}
+		$model = array($this->modelName => $model);
+
+		return $model;
 	}
 	
 	// Find a single model (first result) by the id (primary key)
@@ -290,6 +299,10 @@ class Model extends Object {
 			// apply the formatter method to the value
 			if (isset($schema['formatter'])) {
 				$formatter = $schema['formatter'];
+				// handle date-type formats where the incoming value is not an integer
+				if ($formatter == 'date' && !is_int($value)) {
+					$value = strtotime($value);
+				}
 				if (isset($schema['format'])) {
 					$value = $formatter($schema['format'], $value);
 				} else {

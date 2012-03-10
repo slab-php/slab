@@ -2,7 +2,7 @@
 /* global_functions.php
 ** Defines global support functions
 ** Some of these are copied from CakePHP's basics.php
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
+** (CC A-SA) Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
 ** Changes:
 */
 
@@ -49,6 +49,8 @@ function toLower($s) { return strtolower($s); }
 function toUpper($s) { return strtoupper($s); }
 function uc($s) { return strtoupper($s); }
 function lc($s) { return strtolower($s); }
+function up($s) { return strtoupper($s); }
+function low($s) { return strtolower($s); }
 
 // Returns if a given string $source contains the specified search string $search
 // If $search is an array, returns true if any of the items in $search is contained in $source

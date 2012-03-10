@@ -258,8 +258,13 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 			// if $_FILES['tmp_name'] exists this is the data[Model][field_name] format
 			foreach ($_FILES as $el=>$models) {
 				foreach ($models as $modelName=>$elArr) {
-					foreach ($elArr as $fieldName=>$val) {
-						$controller->data[$modelName][$fieldName][$el] = $val;
+					if (is_array($elArr)) {
+						foreach ($elArr as $fieldName=>$val) {
+							$controller->data[$modelName][$fieldName][$el] = $val;
+						}
+					} else {
+						// actually this is data[field_name]...
+						$controller->data[$modelName][$el] = $elArr;
 					}
 				}
 			}
@@ -331,7 +336,8 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		// make sure the method exists
 		$methods = array_flip($controller->methods);
 		if (!isset($methods[$actionName])) {
-			e('The <em>'.$actionName.'</em> action could not be found in the controller');
+			$controllerClass = get_class($controller);
+			e("The <em>{$actionName}</em> action could not be found in the <em>{$controllerClass}</em> controller");
 			die();
 		}
 	}
@@ -460,8 +466,7 @@ $Dispatcher_helperRefs[$helperName] = $helper;
 	static function loadThirdParty($filename) {
 		$thirdPartyFilename = SLAB_APP.'/third_party/'.$filename.'.php';
 		if (!file_exists($thirdPartyFilename)) {
-			// fall backk to core third party files
-			$thirdPartyFilename = SLAP_LIB.'/third_party/'.$filename.'.php';
+			$thirdPartyFilename = SLAB_LIB.'/third_party/'.$filename.'.php';
 			if (!file_exists($thirdPartyFilename)) {
 				throw new Exception('The third party extension could not be found: '.$filename);
 			}

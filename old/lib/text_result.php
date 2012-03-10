@@ -15,7 +15,7 @@ class TextResult extends ActionResult {
 		e($this->s);
 	}
 	
-	function returnRender() {
+	function renderToString() {
 		return $this->s;
 	}
 };

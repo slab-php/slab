@@ -26,6 +26,23 @@ class FileComponent extends Component {
 		return file_exists($filename);
 	}
 
+	function loadPostedFile($postedFile) { return $this->readPostedFile($postedFile); }
+	function readPostedFile($postedFile) {
+		if (empty($postedFile)) {
+			throw new Exception('No data provided');
+		}
+		
+		if (is_array($postedFile)) {
+			$postedFile = $postedFile['tmp_name'];
+		}
+		
+		if (!is_uploaded_file($postedFile)) {
+			throw new Exception('Invalid uploaded file location');
+		}
+		
+		return $this->read($postedFile);
+	}
+
 	// Reads the file
 	function read($filename, $mode = 'rb') {
 		if (!$this->exists($filename)) {

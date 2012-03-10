@@ -25,7 +25,7 @@ class AjaxResult extends ActionResult {
 		}
 	}
 	
-	function returnRender() {
+	function renderToString() {
 		return $this->data;
 	}
 };

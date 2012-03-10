@@ -52,8 +52,17 @@ class Controller extends Object {
 	
 	
 	// set $this->view->data
-	function set($key, $value) {
-		$this->view->data[$key] = $value;
+	function set($key, $value = null) {
+		if (!is_array($key)) $key = array($key => $value);
+
+		foreach ($key as $k => $v) {
+			$this->view->data[$k] = $v;
+		}
+	}
+	
+	// just change the layout:
+	function layout($l) {
+		$this->view->setLayout($l);
 	}
 	
 	// These methods are used to generate the result of an action
@@ -79,7 +88,8 @@ class Controller extends Object {
 		}
 		$this->actionResult = new ViewResult($this->view);
 	}	
-	function partial() {
+	function partial($view = null) {
+		if (isset($view)) $this->view->setView($view);
 		$this->actionResult = new PartialResult($this->view);
 	}
 	function redirect($u) {
@@ -120,6 +130,12 @@ class Controller extends Object {
 	// excute another action and use the result of that action for this action (nested dispatch)
 	function action($cap, $data = null) {
 		$this->actionResult = Dispatcher::dispatch($cap, $data);
+	}
+	function objectResult($obj) {
+		$this->actionResult = new ObjectResult($obj);
+	}
+	function controllerResult($controller) {
+		$this->actionResult = new ControllerResult($controller);
 	}
 	
 	// This should only be used outside of a controller action as it is a dirty way of redirecting.

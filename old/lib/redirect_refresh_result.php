@@ -16,7 +16,7 @@ class RedirectRefreshResult extends ActionResult {
 		header('Refresh: 0; '.Dispatcher::url($this->url));
 	}
 	
-	function returnRender() {
+	function renderToString() {
 		return $this->url;
 	}
 };

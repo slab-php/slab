@@ -12,10 +12,10 @@ class PartialResult extends ActionResult {
 	}
 	
 	function render() {
-		e($this->returnRender());
+		e($this->renderToString());
 	}
 	
-	function returnRender() {
+	function renderToString() {
 		$layoutName = $this->view->layoutName;
 		$this->view->layoutName = 'blank';		
 		$result = $this->view->render();		

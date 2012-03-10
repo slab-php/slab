@@ -12,13 +12,17 @@ class JsonResult extends ActionResult {
 	}
 	
 	function render() {
+		$json = json_encode($this->obj);
+	
 		$html =& Dispatcher::loadHelper('html');
 		$html->headerNoCache();
-		e($this->returnRender());
+		e($json);
 	}	
 	
-	function returnRender() {
-		return json_encode($this->obj);
+	function renderToString() {
+		$json = json_encode($this->obj);
+		
+		return $json;
 	}
 };
 

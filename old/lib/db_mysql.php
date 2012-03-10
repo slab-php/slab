@@ -11,16 +11,16 @@ class DbMySql extends Database {
 	var $connection = null;
 	var $columnTypes = array(
 		'primary_key'	=> array('formatter' => 'intval'),
-		'string'	=> array('limit' => '255'),
-		'text'		=> array(),
-		'integer'	=> array('limit' => '11', 'formatter' => 'intval'),
-		'float'		=> array('formatter' => 'floatval'),
-		'datetime'	=> array('format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp'	=> array('format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'time'		=> array('format' => 'H:i:s', 'formatter' => 'date'),
-		'date'		=> array('format' => 'Y-m-d', 'formatter' => 'date'),
+		'string'	=> array('limit' => '255', 'default' => ''),
+		'text'		=> array('default' => ''),
+		'integer'	=> array('limit' => '11', 'formatter' => 'intval', 'default' => 0),
+		'float'		=> array('formatter' => 'floatval', 'default' => 0),
+		'datetime'	=> array('format' => 'Y-m-d H:i:s', 'formatter' => 'date', 'default' => '1970-01-01'),
+		'timestamp'	=> array('format' => 'Y-m-d H:i:s', 'formatter' => 'date', 'default' => '1970-01-01'),
+		'time'		=> array('format' => 'H:i:s', 'formatter' => 'date', 'default' => '0:0:0'),
+		'date'		=> array('format' => 'Y-m-d', 'formatter' => 'date', 'default' => '1970-01-01'),
 		'blob'		=> array(),
-		'bool'		=> array('limit' => '1')
+		'bool'		=> array('limit' => '1', 'default' => false)
 	);
 	
 	function connect() {
@@ -86,11 +86,9 @@ class DbMySql extends Database {
 		$result = mysql_query($sql, $this->connection);
 		if (!$result) {
 			throw new Exception(mysql_error().': '.h($sql));
-			//return mysql_error().': '.h($sql);
-			//return 'Error in DbMySql.query()';
 		}
 		
-		if (!strStartsWith(toUpper($sql), array('SELECT','SHOW'))) {
+		if (!strStartsWith(uc($sql), array('SELECT','SHOW'))) {
 			// not a select operation, just return the result
 			return $result;
 		}
@@ -109,12 +107,10 @@ class DbMySql extends Database {
 	function update($table, $data, $conditions) {
 		$valueArray = array();
 		foreach ($data as $key=>$value) {
-			$valueArray[] = $key.'='.$value;
+			$valueArray[] = '`'.$key.'`='.$value;
 		}
 			
 		$sql = 'UPDATE '.$this->tablePrefix.$table.' SET '.implode(', ', $valueArray).' WHERE '.$conditions;
-
-		// execute the query
 		$result = mysql_query($sql, $this->connection);
 		
 		if (!$result) {
@@ -129,7 +125,7 @@ class DbMySql extends Database {
 	function insert($table, $data) {
 		$sql = 
 			'INSERT INTO '.$this->tablePrefix.$table.'('
-			.implode(', ', array_keys($data))
+			.'`'.implode('`, `', array_keys($data)).'`'
 			.') VALUES('
 			.implode(', ', array_values($data))
 			.')';
@@ -200,7 +196,10 @@ class DbMySql extends Database {
 
 	function getTableSchema($tableName) {
 		$schema = array();
-		$results = $this->query('SHOW COLUMNS FROM `'.$tableName.'`');
+
+		$sql = 'SHOW COLUMNS FROM `'.$tableName.'`';
+		$results = $this->query($sql);
+
 		foreach ($results as $row) {
 			$schema[$row['Field']] = array();
 			if ($row['Key'] == 'PRI') {

@@ -8,8 +8,101 @@
 class HtmlHelper extends Helper {
 	var $name = 'HtmlHelper';
 	
-	function select($name, $id, $options, $current = null) {
+	function label($forId, $value) {
+		$value = h($value);
+		
+		$r = '<label';
+		if (!empty($forId)) $r .= " for='{$forId}'";		
+		$r .= ">{$value}</label>";
+		
+		return $r;
+	}	
+	
+	function inputHidden($params) {
+		$params = array_merge(array(
+			'name' => '',
+			'id' => '',
+			'value' => '',
+		), $params);
+		extract($params);
+		
+		return "<input type='hidden' name='{$name}' id='{$id}' value='{$value}' />";
+	}
+	function inputText($params) {
+		$params = array_merge(array(
+			'type' => 'text'
+		), $params);
+		return $this->input($params);
+	}
+	function inputUrl($params) {
+		$params = array_merge(array(
+			'type' => 'url'
+		), $params);
+		return $this->input($params);
+	}
+	function inputFile($params) {
+		$params = array_merge(array(
+			'type' => 'file'
+		), $params);
+		return $this->input($params);
+	}
+	function input($params) {
+		$params = array_merge(array(
+			'name' => '',
+			'id' => '',
+			'value' => '',
+			'label' => null,
+			'type' => 'text'
+		), $params);
+		extract($params);
+		
 		$s = '';
+		
+		if (isset($label)) {
+			$s .= "<label for='{$id}'>{$label}</label> ";
+		}
+		
+		$s .= "<input type='{$type}' name='{$name}' id='{$id}' value='{$value}' />";
+		
+		return $s;
+	}
+	function textarea($params) {
+		$params = array_merge(array(
+			'name' => '',
+			'id' => '',
+			'value' => '',
+			'label' => null,
+			'rows' => 8,
+			'cols' =>  80
+		), $params);
+		extract($params);
+		
+		$s = '';
+		
+		if (isset($label)) {
+			$s .= "<label for='{$id}'>{$label}</label> ";
+		}
+		
+		$s .= "<textarea name='{$name}' id='{$id}' rows='{$rows}' cols='{$cols}'>{$value}</textarea>";
+		
+		return $s;
+	}
+	
+	function select($params) {
+		$params = array_merge(array(
+			'name' => '',
+			'id' => '',
+			'options' => '',
+			'current' => null,
+			'label' => null,
+		), $params);
+		extract($params);
+		
+		$s = '';
+		
+		if (isset($label)) {
+			$s .= "<label for='{$id}'>{$label}</label> ";
+		}
 		
 		foreach ($options as $k => $v) {
 			$s .= "<option value='{$k}'";
