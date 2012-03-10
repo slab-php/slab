@@ -9,9 +9,9 @@ The original Slab is currently in `old/`, and I'm starting basically from scratc
 
 ## License
 
-Licensed under the Attribution-ShareAlike 2.0 Generic ([CC BY-SA 2.0][ccsa])] license.
+Licensed under the Attribution-ShareAlike 2.0 Generic ([CC BY-SA 2.0][ccsa]) license.
 
 May contain third-party components under other licenses, I will try to keep this up to date.
 
 
-	ccsa: http://creativecommons.org/licenses/by-sa/2.0/
+[ccsa]: http://creativecommons.org/licenses/by-sa/2.0/
