@@ -1,2 +1,0 @@
-<p>Test index</p>
-
