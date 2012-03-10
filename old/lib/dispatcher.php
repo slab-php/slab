@@ -331,8 +331,7 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		// make sure the method exists
 		$methods = array_flip($controller->methods);
 		if (!isset($methods[$actionName])) {
-			$controllerClass = get_class($controller);
-			e("The <em>{$actionName}</em> action could not be found in the <em>{$controllerClass}</em> controller");
+			e('The <em>'.$actionName.'</em> action could not be found in the controller');
 			die();
 		}
 	}

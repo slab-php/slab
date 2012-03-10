@@ -49,8 +49,6 @@ function toLower($s) { return strtolower($s); }
 function toUpper($s) { return strtoupper($s); }
 function uc($s) { return strtoupper($s); }
 function lc($s) { return strtolower($s); }
-function up($s) { return strtoupper($s); }
-function low($s) { return strtolower($s); }
 
 // Returns if a given string $source contains the specified search string $search
 // If $search is an array, returns true if any of the items in $search is contained in $source
