@@ -1,6 +1,6 @@
 <?php
 
-function getMimeTypeForExtension($ext) {
+function get_mime_type_for_extension($ext) {
 	global $slabMimeTypes;
 	
 	$mimeType = 'application/octet-stream';
@@ -13,12 +13,12 @@ function getMimeTypeForExtension($ext) {
 	return $mimeType;
 }
 
-function getMimeTypeForFilename($filename) {
+function get_mime_type_for_filename($filename) {
 	$mimeType = 'application/octet-stream';
 	if (strpos($filename, '.') !== false) {
 		$parts = explode('.', $filename);
 		$ext = end($parts);
-		$mimeType = getMimeTypeForExtension($ext);
+		$mimeType = get_mime_type_for_extension($ext);
 	}
 	return $mimeType;
 }
