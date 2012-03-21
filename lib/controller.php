@@ -4,6 +4,7 @@ class Controller extends Object {
 	var $methods = array();
 	var $data = array();
 	var $viewRenderer = null;
+	var $actionResult = null;
 
 	function Controller() {
 		$childMethods = get_class_methods($this);
@@ -18,6 +19,17 @@ class Controller extends Object {
 
 		$this->viewRenderer = new ViewRenderer($this);
 	}
+
+	function beforeAction() {}
+	function afterAction() {}
+
+	// Results:
+	function view($view = null, $layout = null) {
+		if (isset($view)) $this->viewRenderer->setView($view);
+		if (isset($layout)) $this->viewRender->setLayout($layout);
+		$this->actionResult = new ViewResult($this->viewRender);
+	}
+	function text($text) { $this->actionResult = new TextResult($text); }
 };
 
 ?>

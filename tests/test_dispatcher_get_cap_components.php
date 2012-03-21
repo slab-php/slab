@@ -10,7 +10,7 @@ class Test_dispatcher_get_cap_components extends UnitTestCase {
 		$this->assertEqual($components, array(
 			'controllerName' => 'controller',
 			'actionName' => 'index',
-			'params' => ''));
+			'params' => array()));
 	}
 
 	function test_gets_controller_name() {

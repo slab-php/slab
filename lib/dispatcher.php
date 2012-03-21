@@ -2,12 +2,40 @@
 // dispatcher.php
 
 class Dispatcher {
+	static $inDispatch = false;
+
 	static function dispatch($cap = null, $data = null) {
-		if (empty($cap)) $cap = Dispatcher::__get_cap($_REQUEST);
-		$components = $this->__getCapComponents($cap);
+		if (self::$inDispatch) {
+			$controller = Dispatcher::__innerDispatch($cap, $data);
+			return $controller->actionResult;
+		}
+
+		self::$inDispatch = true;
+		$controller = Dispatcher::__innerDispatch($cap, $data);
+		self::$inDispatch = false;
+
+		return $controller->actionResult;
+	}
+	static function __innerDispatch($cap = null, $data = null) {
+		if (empty($cap)) $cap = Dispatcher::__getCap($_REQUEST);
+		$components = Dispatcher::__getCapComponents($cap);
 		$controllerName = $components['controllerName'];
 		$actionName = $components['actionName'];
 		$params = $components['params'];
+
+		$controller =& Dispatcher::__loadController($controllerName, $actionName, $params, $data);
+		if (!is_object($controller)) throw new Exception('Error loading controller');
+
+		$controller->beforeAction();
+		try {
+			$controller->callMethod($actionName, $params);
+			if (empty($controller->actionResult)) $controller->view();
+		} catch (Exception $ex) {
+			throw $ex;	// should set an ajaxError
+		}
+		$controller->afterAction();
+
+		return $controller;
 	}
 
 
@@ -54,7 +82,7 @@ EOF;
 	static function __getCapComponents($cap) {
 		$controllerName = '';
 		$actionName = '';
-		$params = '';
+		$params = array();
 
 		$parts = explode('/', $cap);
 		if (count($parts) >= 1) $controllerName = lowercase($parts[0]);
