@@ -29,6 +29,7 @@ class Controller extends Object {
 		if (isset($layout)) $this->viewRender->setLayout($layout);
 		$this->actionResult = new ViewResult($this->viewRender);
 	}
+	function redirect($url) { $this->actionResult = new RedirectResult($url); }
 	function text($text) { $this->actionResult = new TextResult($text); }
 };
 

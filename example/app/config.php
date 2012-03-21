@@ -1,7 +1,8 @@
 <?php
 
-Config::set('app.default_route', '/test/index');
+Dispatcher::setDefaultRoute('/action_tests/redirect_to/static.html');
 
+/*
 // Database
 if ($_SERVER['SERVER_NAME'] == 'localhost') {
 	// development settings
@@ -30,5 +31,6 @@ if ($_SERVER['SERVER_NAME'] == 'localhost') {
 	Config::set('db.database', '');
 	Config::set('db.tablePrefix', '');
 }
+*/
 
 ?>

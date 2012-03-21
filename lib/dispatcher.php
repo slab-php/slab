@@ -2,7 +2,19 @@
 // dispatcher.php
 
 class Dispatcher {
+	static $defaultRoute = null;
+	static $urlRewriting = true;
 	static $inDispatch = false;
+
+	// Configuration:
+	static function setDefaultRoute($defaultRoute) {
+		self::$defaultRoute = $defaultRoute;
+	}
+	static function setUrlRewriting($urlRewriting) {
+		self::$urlRewriting = $urlRewriting;
+	}
+
+
 
 	static function dispatch($cap = null, $data = null) {
 		if (self::$inDispatch) {
@@ -16,6 +28,7 @@ class Dispatcher {
 
 		return $controller->actionResult;
 	}
+
 	static function __innerDispatch($cap = null, $data = null) {
 		if (empty($cap)) $cap = Dispatcher::__getCap($_REQUEST);
 		$components = Dispatcher::__getCapComponents($cap);
@@ -36,6 +49,21 @@ class Dispatcher {
 		$controller->afterAction();
 
 		return $controller;
+	}
+
+	static function url($cap) {
+		global $SLAB_ROOT;
+
+		$root = dirname(env('PHP_SELF'));
+		if ($root == '/') $root = '';
+
+		if (file_exists(dirname($SLAB_ROOT).$cap)) return $root.$cap;
+
+		$url = null;
+		if (self::$urlRewriting) $url = $root.$cap;
+		else $url = env('PHP_SELF').'?slab_url='.str_replace('?', '&amp;', substr($cap, 1, strlen($cap)-1));
+
+		return $url;
 	}
 
 
@@ -73,9 +101,15 @@ EOF;
 	}	
 
 	static function __getCap($request) {
-		$cap = isset($request['slab_url']) ? $request['slab_url'] : Config::get('default_route');
+		$cap = null;
+		
+		if (isset($request['slab_url'])) $cap = $request['slab_url'];
+		else $cap = Dispatcher::$defaultRoute;
+
 		if (!isset($cap)) throw new Exception("No valid route was found. Make sure that the default_route setting is properly configured");
+		
 		if (strpos($cap, '/') === 0) $cap = substr($cap, 1);
+		
 		return $cap;
 	}
 

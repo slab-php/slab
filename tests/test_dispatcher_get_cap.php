@@ -6,17 +6,16 @@ require_once("{$root}/../lib/dispatcher.php");
 
 class Test_dispatcher_get_cap extends UnitTestCase {
 	function setUp() {
-		Config::clear();
+		Dispatcher::setDefaultRoute(null);
 	}
 
 	function test_when_slab_url_is_provided_then_get_cap_returns_slab_url() {
-		Config::set('default_route', 'default route');
 		$request = array('slab_url' => 'request route');
 		$this->assertEqual(Dispatcher::__getCap($request), 'request route');
 	}
 
 	function test_when_slab_url_is_not_provided_then_returns_default_route() {
-		Config::set('default_route', 'default route');
+		Dispatcher::setDefaultRoute('default route');
 		$this->assertEqual(Dispatcher::__getCap(array()), 'default route');
 	}
 
@@ -31,8 +30,8 @@ class Test_dispatcher_get_cap extends UnitTestCase {
 			'test/route');
 	}
 	
-	function test_when_configured_route_has_preceding_slash_it_is_removed() {
-		Config::set('default_route', '/test/route');
+	function test_when_default_route_has_preceding_slash_it_is_removed() {
+		Dispatcher::setDefaultRoute('/test/route');
 		$this->assertEqual(
 			Dispatcher::__getCap(array()),
 			'test/route');
