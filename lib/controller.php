@@ -2,7 +2,9 @@
 
 class Controller extends Object {
 	var $methods = array();
-	
+	var $data = array();
+	var $viewRenderer = null;
+
 	function Controller() {
 		$childMethods = get_class_methods($this);
 		foreach ($childMethods as $key => $value) {
@@ -13,6 +15,8 @@ class Controller extends Object {
 			$parentMethods[$key] = strtolower($value);
 		}
 		$this->methods = array_diff($childMethods, $parentMethods);
+
+		$this->viewRenderer = new ViewRenderer($this);
 	}
 };
 

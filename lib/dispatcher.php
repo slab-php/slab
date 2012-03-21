@@ -12,6 +12,38 @@ class Dispatcher {
 
 
 
+	static function &__loadController($controllerName, $actionName, $params, $data = null) {
+		$className = Inflector::camelize($controllerName);
+		$filename = Dispatcher::__getControllerFilename($controllerName);
+
+		if (!file_exists($filename)) {
+			$msg = <<<EOF
+The <em>{$className}</em> controller could not be found at <code>{$filename}</code>
+EOF;
+			throw new Exception($msg);
+		}
+
+		require_once($filename);
+
+		if (!class_exists($className)) {
+			$msg = <<<EOF
+The <em>{$className}</em> controller could not be loaded. Make
+sure the <em>{$className}</em> controller is defined at 
+<code>{$filename}</code>.
+EOF;
+			throw new Exception($msg);
+		}
+
+		$controller = new $className();
+
+		Dispatcher::__checkAction($controller, $actionName);
+
+		$controller->data = Dispatcher::__getIncomingData($data);
+		$controller->viewRenderer->viewName = "{$controllerName}/{$actionName}";
+
+		return $controller;
+	}	
+
 	static function __getCap($request) {
 		$cap = isset($request['slab_url']) ? $request['slab_url'] : Config::get('default_route');
 		if (!isset($cap)) throw new Exception("No valid route was found. Make sure that the default_route setting is properly configured");
@@ -37,25 +69,6 @@ class Dispatcher {
 		);
 	}
 
-	static function &__loadController($controllerName, $actionName, $params, $data = null) {
-		$className = Inflector::camelize($controllerName);
-		$filename = Dispatcher::__getControllerFilename($controllerName);
-
-		if (!file_exists($filename)) {
-			throw new Exception("The <em>$className</em> controller could not be found at <code>$filename</code>");
-		}
-
-		require_once($filename);
-
-		if (!class_exists($className)) {
-			throw new Exception("The <em>{$className}</em> controller could not be loaded. Make sure the <em>{$className}</em> controller is defined at <code>{$filename}</code>.");
-		}
-
-		$controller = new $className();
-
-		return $controller;
-	}
-
 	static function __getControllerFilename($controllerName) {		
 		global $SLAB_APP_CONTROLLERS;
 
@@ -79,6 +92,38 @@ class Dispatcher {
 			$controllerClass = get_class($controller);
 			throw new Exception("The <em>{$actionName}</em> action could not be found in <em>{$controllerClass}</em>");
 		}
+	}
+
+	static function __getIncomingData($actionData = null) {
+		$data = array();
+
+		if (!empty($actionData)) $data = array_merge($data, $actionData);
+
+		$data = array_merge($data, $_REQUEST);
+		if (isset($data['data'])) {
+			$data = array_merge($data, $data['data']);
+			unset($data['data']);
+		}
+
+		if (isset($_FILES['data'])) {
+			$_FILES = array_merge($_FILES, $_FILES['data']);
+			unset($_FILES['data']);
+		}
+		if (empty($_FILES['tmp_name'])) $data = array_merge($data, $_FILES);
+		else {
+			foreach ($_FILES as $el => $models) {
+				foreach ($models as $modelName => $elArr) {
+					if (!is_array($elArr)) $data[$modelName][$el] = $elArr;
+					else {
+						foreach ($elArr as $fieldName => $val) {
+							$data[$modelName][$fieldName][$el] = $val;
+						}
+					} 
+				}
+			}
+		}
+
+		return $data;
 	}
 }
 

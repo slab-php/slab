@@ -1,6 +1,6 @@
 <?php
 
-class DispatcherLoadControllerTest {
+class DispatcherLoadControllerTest extends Controller {
 	function test() { return ''; }
 }
 

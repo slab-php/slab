@@ -11,18 +11,26 @@ class Test_dispatcher_load_controller extends UnitTestCase {
 		$this->expectException();
 		Dispatcher::__loadController('none', 'none', 'none');
 	}
+
 	function test_returns_correct_controller() {
-		$controller = Dispatcher::__loadController('dispatcher_load_controller_test', null, null);
+		$controller = Dispatcher::__loadController('dispatcher_load_controller_test', 'test', null);
 		$this->assertIsA($controller, 'DispatcherLoadControllerTest');
 	}
+
 	function test_no_class_in_file_throws_exception() {
 		$this->expectException();
 		Dispatcher::__loadController('dispatcher_load_controller_no_class_test', 'test', null);
 	}
+	
 	function test_action_not_found_throws_exception() {
 		$this->expectException();
 		Dispatcher::__loadController('dispatcher_load_controller_test', 'none', null);
 	}
+
+	function test_default_view_renderer_reflects_action() {
+		$controller = Dispatcher::__loadController('dispatcher_load_controller_test', 'test', null);
+		$this->assertEqual($controller->viewRenderer->viewName, 'dispatcher_load_controller_test/test');
+	}	
 }
 
 ?>
