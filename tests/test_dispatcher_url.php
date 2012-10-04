@@ -13,21 +13,21 @@ class Test_dispatcher_url extends UnitTestCase {
 
 	function test_normal_c_a_p() {
 		$url = Dispatcher::url('/c/a/p');
-		$this->assertEqual($url, 'tests/c/a/p');
+		$this->assertEqual($url, '/swxben/slab/tests/c/a/p');
 	}
 	function test_physical_file() {
 		$url = Dispatcher::url('/readme.md');
-		$this->assertEqual($url, 'tests/readme.md');
+		$this->assertEqual($url, '/swxben/slab/tests/readme.md');
 	}
 	function test_c_a_p_without_url_rewriting() {
 		Dispatcher::setUrlRewriting(false);
 		$url = Dispatcher::url('/c/a/p');
-		$this->assertEqual($url, 'tests/all_tests.php?slab_url=c/a/p');
+		$this->assertEqual($url, '/swxben/slab/tests/all_tests.php?slab_url=c/a/p');
 	}
 	function test_physical_file_without_url_rewriting() {
 		Dispatcher::setUrlRewriting(false);
 		$url = Dispatcher::url('/readme.md');
-		$this->assertEqual($url, 'tests/readme.md');
+		$this->assertEqual($url, '/swxben/slab/tests/readme.md');
 	}
 }
 
