@@ -8,6 +8,10 @@ Config::set('app.default_components', array());	// don't load any components
 Config::set('app.load_model_schemas', true);
 Config::set('app.url_rewriting', true);
 
+// Session
+Config::set('session.type', 'file');
+Config::set('session.cookie_name', 'MYAPP_session');
+
 // Database
 if ($_SERVER['SERVER_NAME'] == 'localhost') {
 	// development settings
