@@ -1,15 +1,4 @@
 <?php
-/* dispatcher.php
-** Originally based on CakePHP's Dispatcher class but with a lot less magic
-** The dispatcher is (almost) stateless and used across the app via static methods.
-** The $inDispatch state is used to distinguish between the top-level call to Dispatch() and nested calls to Dispatch()
-** (which can be done within views and actions) so that the component shutdown only happens after the top-level dispatch
-** completes.
-** This class has now also been defaced by making it not really static as PHP4 doesn't support static class members.
-** Die already PHP4.
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
-
 $Dispatcher_componentRefs = array();
 $Dispatcher_helperRefs = array();
 $Dispatcher_baseUrl = '';
