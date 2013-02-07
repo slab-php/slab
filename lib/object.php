@@ -1,21 +1,31 @@
 <?php
+/* object.php
+** Base class for all objects in the framework. Inspired by / based on CakePHP.
+** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
+*/
 
 class Object {
+	function __construct() {}
+
+	// Override this for own implementation
 	function toString() {
 		return get_class($this);
 	}
 	
-	function callMethod($method, $params = array()) {
-		$paramCount = count($params);
-
-		if ($paramCount == 0) return $this->{$method}();
-		else if ($paramCount == 1) return $this->{$method}($params[0]);
-		else if ($paramCount == 2) return $this->{$method}($params[0], $params[1]);
-		else if ($paramCount == 3) return $this->{$method}($params[0], $params[1], $params[2]);
-		else if ($paramCount == 4) return $this->{$method}($params[0], $params[1], $params[2], $params[3]);
-		else if ($paramCount == 5) return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
-
-		return call_user_func_array(array(&$this, $method), $params);
+	// From CakePHP:
+	//   Calls a method on this object with the given parameters. Provides an OO wrapper
+	//   for call_user_func_array, and improves performance by using straight method calls
+	//   in most cases.
+	function dispatchMethod($method, $params = array()) {
+		switch (count($params)) {
+			case 0: return $this->{$method}();
+			case 1: return $this->{$method}($params[0]);
+			case 2: return $this->{$method}($params[0], $params[1]);
+			case 3: return $this->{$method}($params[0], $params[1], $params[2]);
+			case 4: return $this->{$method}($params[0], $params[1], $params[2], $params[3]);
+			case 5: return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
+			default: return call_user_func_array(array(&$this, $method), $params); break;
+		}
 	}
 };
 

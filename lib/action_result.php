@@ -1,8 +1,7 @@
 <?php
-
-class ActionResult {
+class ActionResult extends Object {
 	function render() {}
 	function renderToString() { return ''; }
-}
+};
 
 ?>

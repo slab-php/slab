@@ -1,16 +1,19 @@
 <?php
+/* RedirectResult
+** A kind of ActionResult that redirects to the provided url
+** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
+*/
 
 class RedirectResult extends ActionResult {
 	var $url = null;
 	
-	function RedirectResult($url) {
+	function __construct($url) {
 		$this->url = $url;
 	}
 	
 	function render() {
-		$actualUrl = Dispatcher::url($this->url);
-		//header('Status: 302');
-		header("Location: {$actualUrl}");
+		header('Status: 302');
+		header('Location: '.Dispatcher::url($this->url));
 	}
 	
 	function renderToString() {
