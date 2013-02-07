@@ -1,0 +1,1 @@
+<p>stub/app/views/pages/index.php</p>
