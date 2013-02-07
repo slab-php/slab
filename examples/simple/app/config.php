@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 // Application
 Config::set('app.default_route', '/test/index');
 Config::set('app.default_components', array());	// don't load any components
