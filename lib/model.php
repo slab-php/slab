@@ -1,19 +1,20 @@
 <?php
-/* Model
-** Base class for models, or used as is if a model isn't defined in the app
-*/
 
 class Model extends Object {
-	var $modelName = null;
 	var $tableName = null;
-	var $primaryFieldName = 'id';
-	var $schema = null;		// the table schema (loaded from the database on initialisation)
-	var $db = null;			// reference to database
+	var $primaryFieldName = null;
+	var $schema = null;
+	var $database = null;
 	var $id = null;
-	
+
+	function __construct($database, $tableName, $primaryFieldName = 'id') {
+		$this->database = $database;
+		$this->tableName = $tableName;
+		$this->primaryFieldName = $primaryFieldName;
+	}	
 
 	function getLastError() {
-		return $this->db->getLastError();
+		return $this->database->getLastError();
 	}
 	
 	function create() {
@@ -36,7 +37,7 @@ class Model extends Object {
 		}
 		$this->id = $id;
 		
-		$result = $this->db->select(
+		$result = $this->database->select(
 			$this->tableName,
 			$fields,
 			$this->primaryFieldName.'='.$this->escape($id, $this->primaryFieldName)
@@ -52,7 +53,7 @@ class Model extends Object {
 	function findAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
 	function getAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
 	function loadAll($conditions=null, $fields=null, $order=null) {
-		$results = $this->db->select(
+		$results = $this->database->select(
 			$this->tableName,
 			$fields,
 			$conditions,
@@ -70,7 +71,7 @@ class Model extends Object {
 	function findAllByQuery($sql) { return $this->loadAllByQuery($sql); }
 	function getAllByQuery($sql) { return $this->loadAllByQuery($sql); }
 	function loadAllByQuery($sql) {
-		$results = $this->db->query($sql);
+		$results = $this->database->query($sql);
 		$results2 = array();
 		foreach ($results as $r) {
 			$results2[] = array($this->modelName => $r);
@@ -82,7 +83,7 @@ class Model extends Object {
 	function findFirst($conditions=null, $fields=null, $order=null) { return $this->loadFirst($conditions, $fields, $order); }
 	function getFirst($conditions=null, $fields=null, $order=null) { return $this->loadFirst($conditions, $fields, $order); }
 	function loadFirst($conditions=null, $fields=null, $order=null) {
-		$result = $this->db->select(
+		$result = $this->database->select(
 			$this->tableName,
 			$fields,
 			$conditions,
@@ -96,9 +97,9 @@ class Model extends Object {
 	}
 	
 	// find the first model by the given key and value, or an array of key/values in $key
-	function findBy($key, $val=null) { return $this->loadBy($key, $val); }
-	function getBy($key, $val=null) { return $this->loadBy($key, $val); }
-	function loadBy($key, $val=null) {
+	function findatabasey($key, $val=null) { return $this->loadatabasey($key, $val); }
+	function getBy($key, $val=null) { return $this->loadatabasey($key, $val); }
+	function loadatabasey($key, $val=null) {
 		$condition = '';
 		
 		if (!is_array($key)) {
@@ -181,14 +182,14 @@ class Model extends Object {
 		if (isset($data[$this->primaryFieldName])) {
 			$this->id = $data[$this->primaryFieldName];
 			unset($data[$this->primaryFieldName]);
-			$result = $this->db->update(
+			$result = $this->database->update(
 				$this->tableName,
 				$data,
 				$this->primaryFieldName.'='.$this->id);
 			$data[$this->primaryFieldName] = $this->id;
 			return $result;
 		} else {
-			$this->id = $this->db->insert(
+			$this->id = $this->database->insert(
 				$this->tableName,
 				$data);
 			return $this->id;
@@ -220,7 +221,7 @@ class Model extends Object {
 			$id = $id[$this->modelName][$this->primaryFieldName];
 		}
 		$this->id = $id;
-		return $this->db->delete($this->tableName, $this->primaryFieldName.'='.$this->escape($this->id, $this->primaryFieldName));
+		return $this->database->delete($this->tableName, $this->primaryFieldName.'='.$this->escape($this->id, $this->primaryFieldName));
 	}
 	
 	// removeAll(), delAll() and deleteAll() are synonyms, delete the models specified
@@ -231,7 +232,7 @@ class Model extends Object {
 		if (!empty($conditions) && is_array($conditions)) {
 			$conditions = $this->__processConditions($conditions);
 		}
-		return $this->db->delete($this->tableName, $conditions);
+		return $this->database->delete($this->tableName, $conditions);
 	}
 	
 	// returns true if the model specified by the given id or if models exist in the
@@ -258,16 +259,16 @@ class Model extends Object {
 	// given conditions
 	function count($conditions = null) {
 		$conditions = $this->__processConditions($conditions);
-		$result = $this->db->select(
+		$result = $this->database->select(
 			$this->tableName,
 			'COUNT(*) AS row_count',
 			$conditions);
 		return $result[0]['row_count'];
 	}
 	
-	// Just calls $this->db->query()
+	// Just calls $this->database->query()
 	function query($q) { 
-		return $this->db->query($q);
+		return $this->database->query($q);
 	}
 	
 	// Escape the given data for use in a SQL statement. If the field name is provided the
@@ -310,22 +311,22 @@ class Model extends Object {
 				}
 			}
 
-			// if this is a string and there is a limit, use substring to apply the method now to avoid db truncation warnings
+			// if this is a string and there is a limit, use substring to apply the method now to avoid database truncation warnings
 			if ($schema['type'] == 'string' && isset($schema['limit'])) {
 				if ($schema['limit'] < strlen($value)) {
 					$value = substr($value, 0, $schema['limit']);
 				}
 			}
 			
-			return $this->db->makeValueSafe($value, $schema['type']);
+			return $this->database->makeValueSafe($value, $schema['type']);
 		}
 
-		return $this->db->makeValueSafe($value);
+		return $this->database->makeValueSafe($value);
 	}
 	
 	// Load the schema from the database
 	function loadSchema() {
-		$this->schema = $this->db->getTableSchema($this->tableName);
+		$this->schema = $this->database->getTableSchema($this->tableName);
 	}
 };
 

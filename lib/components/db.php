@@ -1,17 +1,16 @@
 <?php
-/* DbComponent
-** This is mainly just a wrapper for the configured implementation of Database
-** BJS20091005
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class DbComponent extends Component {
+	var $config = null;
 	var $db = null;	// reference to a Database instance
 
+	function __construct($config) {
+		$this->config = $config;
+	}
+
 	function init() {
-		// configure and connect the database
 		$this->db = null;
-		$driver = Config::get('db.driver');
+		$driver = $this->config->get('db.driver');
 		if ($driver == 'mysql') {
 			require_once(SLAB_LIB.'/db_mysql.php');
 			$this->db = new DbMySql();
@@ -19,12 +18,12 @@ class DbComponent extends Component {
 		// add other database drivers here
 		
 		if (!empty($this->db)) {
-			$this->db->host = Config::get('db.host');
-			$this->db->port = Config::get('db.port');
-			$this->db->login = Config::get('db.login');
-			$this->db->password = Config::get('db.password');
-			$this->db->database = Config::get('db.database');
-			$this->db->tablePrefix = Config::get('db.tablePrefix');
+			$this->db->host = $this->config->get('db.host');
+			$this->db->port = $this->config->get('db.port');
+			$this->db->login = $this->config->get('db.login');
+			$this->db->password = $this->config->get('db.password');
+			$this->db->database = $this->config->get('db.database');
+			$this->db->tablePrefix = $this->config->get('db.tablePrefix');
 
 			if (!$this->db->connect()) {
 				e('An error occured while connecting to the database: '.$this->getLastError());
