@@ -1,20 +1,19 @@
 <?php
-$Dispatcher_componentRefs = array();
-$Dispatcher_helperRefs = array();
-$Dispatcher_baseUrl = '';
-$Dispatcher_inDispatch = false;
 
 class Dispatcher extends Object {
-	//var $componentRefs = array();
-	//var $helperRefs = array();
-	//var $baseUrl = '';
-	//var $inDispatch = false;
+	var $componentRefs = array();
+	var $helperRefs = array();
+	var $baseUrl = '';
+	var $inDispatch = false;
+	var $config = null;
+
+	function __construct($config) {
+		$this->config = $config;
+	}
 
 	//static
 	function getBaseUrl() {
-		//return Dispatcher::$baseUrl;
-		global $Dispatcher_baseUrl;
-		return $Dispatcher_baseUrl;
+		return $this->baseUrl;
 	}
 	
 	function getFilename($filename) {
@@ -23,7 +22,6 @@ class Dispatcher extends Object {
 
 	// returns a working url for the given /c/a/p triad
 	// TODO: this will need to be extended for mod_rewrite support
-	//static
 	function url($cap) {
 		$root = dirname(env('PHP_SELF'));
 		if ($root == '/') {
@@ -36,7 +34,7 @@ class Dispatcher extends Object {
 			return $root.$cap;
 		}
 
-		if (Config::get('app.url_rewriting')) {
+		if ($this->config->get('app.url_rewriting')) {
 			$newUrl = $root.$cap;
 		} else {
 			$newUrl = env('PHP_SELF').'?slab_url='.str_replace('?', '&amp;', substr($cap, 1, strlen($cap)-1));
@@ -45,26 +43,17 @@ class Dispatcher extends Object {
 		// If the Session component is loaded, 
 		// and the session id is persisted via the url, and there is an active
 		// session, include the session id in the url:
-global $Dispatcher_componentRefs;
-		if (
-			//!empty(self::$componentRefs['session']) 
-!empty($Dispatcher_componentRefs['session'])
-			//&& self::$componentRefs['session']->sessionIDType == 'url' 
-&& $Dispatcher_componentRefs['session']->sessionIDType == 'url' 
-			//&& self::$componentRefs['session']->inSession
-&& $Dispatcher_componentRefs['session']->inSession
-			) {
+		if (!empty($this->componentRefs['session'])
+			&& $this->componentRefs['session']->sessionIDType == 'url' 
+			&& $this->componentRefs['session']->inSession) {
 			
 			$newUrl .= '&amp;session_id=';
 			
 			// if possible, encrypt the session id
-//if (empty(self::$componentRefs['security'])) {
-if (empty($Dispatcher_componentRefs['security'])) {
-				//$newUrl .= self::$componentRefs['security']->sessionID;
-$newUrl .= $Dispatcher_componentRefs['security']->sessionID;
+			if (empty($this->componentRefs['security'])) {
+				$newUrl .= $this->componentRefs['security']->sessionID;
 			} else {
-				//$newUrl .= self::$componentRefs['security']->encode(self::$componentRefs['session']->sessionID);
-$newUrl .= $Dispatcher_componentRefs['security']->encode($Dispatcher_componentRefs['session']->sessionID);
+				$newUrl .= $this->componentRefs['security']->encode($this->componentRefs['session']->sessionID);
 			}
 		}
 
@@ -72,9 +61,8 @@ $newUrl .= $Dispatcher_componentRefs['security']->encode($Dispatcher_componentRe
 	}
 	
 	// url() returns a URL absolute to /, absoluteUrl() includes the scheme and host name (like 'http://www.example.com/c/a/p')
-	//static
 	function absoluteUrl($cap) {
-		return 'http://'.env('HTTP_HOST').Dispatcher::url($cap);
+		return 'http://'.env('HTTP_HOST').$this->url($cap);
 	}
 	
 	// Parses the given /c/a/p triad, finds loads and executes the appropriate controller, and returns the result of rendering the view
@@ -83,44 +71,35 @@ $newUrl .= $Dispatcher_componentRefs['security']->encode($Dispatcher_componentRe
 	//static
 	function dispatch($cap = null, $data = null) {
 		// The first time this is called (by the bootstrapping file like /slab.php), $inDispatch is false.
-		//if (self::$inDispatch) {
-		global $Dispatcher_inDispatch;
-		if ($Dispatcher_inDispatch) {
+		if ($this->inDispatch) {
 			// This is being called within an action (while dispatching), just run the dispatch without
 			// shutting down the components
-			$controller = Dispatcher::__innerDispatch($cap, $data);
+			$controller = $this->__innerDispatch($cap, $data);
 			return $controller->actionResult;
 		}
 		
-		//self::$inDispatch = true;
-$Dispatcher_inDispatch = true;
-		$controller = Dispatcher::__innerDispatch($cap);
-		//self::$inDispatch = false;
-		$Dispatcher_inDispatch = false;
+		$this->inDispatch = true;
+		$controller = $this->__innerDispatch($cap);
+		$this->inDispatch = false;
 		
 		// shutdown components
-		//foreach (array_values(self::$componentRefs) as $c) {
-global $Dispatcher_componentRefs;
-foreach (array_values($Dispatcher_componentRefs) as $c) {
+		foreach (array_values($this->componentRefs) as $c) {
 			$c->shutdown();
 		}
 		
 		return $controller->actionResult;
 	}
 
-	//static
 	function __innerDispatch($cap = null, $data = null) {
 		$controllerName = '';
 		$actionName = '';
 		$params = array();
 		
-		//self::$baseUrl = dirname(env('PHP_SELF'));
-		global $Dispatcher_baseUrl;
-		$Dispatcher_baseUrl = dirname(env('PHP_SELF'));
+		$this->baseUrl = dirname(env('PHP_SELF'));
 
 		// If the cap triad is empty, fall back to the REQUEST url, then to the default route
 		if (empty($cap)) {
-			$cap = isset($_REQUEST['slab_url']) ? $_REQUEST['slab_url'] : Config::get('app.default_route');
+			$cap = isset($_REQUEST['slab_url']) ? $_REQUEST['slab_url'] : $this->config->get('app.default_route');
 		}
 		if (empty($cap)) {
 			e('No valid route was found. Make sure that the app.default_route setting is properly configured.');
@@ -148,10 +127,9 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		}
 
 		// Load and create an instance of the controller
-		$controller =& Dispatcher::loadController($controllerName, $actionName, $params, $data);
+		$controller =& $this->loadController($controllerName, $actionName, $params, $data);
 		if (!is_object($controller)) {
-			e('Error loading controller');
-			die();
+			throw new Exception('Error loading controller');
 		}
 
 		// if the Cookie component is loaded, call initCookie() (as the cookie must be initialised before 
@@ -161,30 +139,22 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		}
 				
 		// call the components beforeAction
-		//foreach (array_values($controller->componentRefs) as $c) {
-		//	$c->beforeAction();
-		//}
 		foreach (array_keys($controller->componentRefs) as $k) {
 			$controller->componentRefs[$k]->beforeAction();
 		}
-		// Execute the action. The action should result in $controller->actionResult being set, usually via 
-		// a call to Controller::render().
-		// Nothing should have been output yet, as $actionResult is an instance of a subclass of ActionResult
-		// which has a render() function (this is executed by the entry point file, eg slab.php)
-		// Any uncaught exceptions are translated into an AJAX failure, which just looks like a 500 response
-		// including the exception text
-		$controller->beforeAction();
+
 		try {
+			$controller->beforeAction();
 			$controller->dispatchMethod($actionName, $params);
+			if (empty($controller->actionResult)) {
+				// if the controller's actionResult isn't set, this means that the action didn't execute a view method,
+				// so just default to $controller->view()
+				$controller->view();
+			}
+			$controller->afterAction();
 		} catch (Exception $ex) {
 			$controller->ajaxError($ex->getMessage());
 		}
-		if (empty($controller->actionResult)) {
-			// if the controller's actionResult isn't set, this means that the action didn't execute a view method,
-			// so just default to $controller->view()
-			$controller->view();
-		}
-		$controller->afterAction();
 		
 		// call the components afterAction
 		foreach (array_values($controller->componentRefs) as $c) {
@@ -194,18 +164,15 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		return $controller;
 	}
 		
-	// Find, create and set up an instance of the specified controller
-	// The controllerName is underscored, ie 'shopping_cart' will load the ShoppingCartController class from /controllers/shopping_cart_controller.php
-	// TODO add support for controller domains, eg 'admin.log_in' will load the LogInController class from /controllers/admin/log_in_controller.php
-	//static
 	function &loadController($controllerName, $actionName, $params, $data = null) {
-		$className = Inflector::camelize($controllerName).'Controller';
+		$inflector = new Inflector();
+
+		$className = $inflector->camelize($controllerName).'Controller';
 
 		// try to load from the app
 		$filename = SLAB_APP.'/controllers/'.$controllerName.'_controller.php';
 		if (!file_exists($filename)) {
-			e("<p>The <em>$className</em> controller could not be found at <code>$filename</code><br/>");
-			die();
+			throw new Exception("The {$className} controller could not be found at {$filename}");
 		}
 		
 		// TODO: fall back on plugins
@@ -213,15 +180,11 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		require_once($filename);
 		
 		if (!class_exists($className)) {
-			e('The <em>'.$className.'</em> controller could not be loaded<br/>');
-			e("Make sure the <em>$className</em> controller is defined at <code>$filename</code><br/>");
-			die();
+			throw new Exception("The {$className} controller could not be loaded. Make sure the {$className} controller is defined at {$filename}");
 		}
 		
-		$controller = new $className();
-
-		// Check the validity of the action
-		Dispatcher::__checkAction($controller, $actionName);
+		$controller = new $className($this);
+		$this->__checkAction($controller, $actionName);
 		
 		$controller->actionName = $actionName;
 		$controller->params = $params;
@@ -263,40 +226,27 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		}
 
 		// load and configure components
-		$controller->components = array_merge($controller->components, Config::get('app.default_components'));
-		foreach ($controller->components as $componentName) {
-			$component = &Dispatcher::loadComponent($componentName);
+		foreach ($this->config->get('app.default_components') as $componentName) {
+			$component =& $this->loadComponent($componentName);
 			$component->controller =& $controller;
 			$controller->componentRefs[$componentName] =& $component;
 			// add as both $controller->ComponentName and $controller->componentName
-			$componentName = Inflector::camelize($componentName);
+			$componentName = $inflector->camelize($componentName);
 			$controller->$componentName =& $component;
-			$componentName = Inflector::camelback(Inflector::underscore($componentName));
+			$componentName = $inflector->camelback($inflector->underscore($componentName));
 			$controller->$componentName =& $component;
 		}
 		
-		// load and configure models
-		foreach ($controller->models as $modelName => $tableName) {
-			$model =& Dispatcher::loadModel($modelName, $tableName);
-			$controller->modelRefs[$modelName] =& $model;
-			// add as both $controller->ModelName (not as $controller->modelName, I used to and it causes problems when having things like $this->user set in the AppController)
-			$controller->$modelName =& $model;
-			//$modelName = Inflector::camelback(Inflector::underscore($modelName));
-			//$controller->$modelName =& $model;
-		}
-		
-
 		// set up view
 		$controller->view->viewName = $controllerName.'/'.$actionName;
 		// load helpers into view
-		$controller->helpers = array_merge($controller->helpers, Config::get('app.default_helpers'));
-		foreach ($controller->helpers as $helperName) {
-			$helper =& Dispatcher::loadHelper($helperName);
+		foreach ($this->config->get('app.default_helpers') as $helperName) {
+			$helper =& $this->loadHelper($helperName);
 			// add (as HelperName and helperName) to both the view's helperRefs array and the controller
-			$helperName = Inflector::camelize($helperName);
+			$helperName = $inflector->camelize($helperName);
 			$controller->$helperName =& $helper;
 			$controller->view->helperRefs[$helperName] =& $helper;
-			$helperName = Inflector::camelback(Inflector::underscore($helperName));
+			$helperName = $inflector->camelback($inflector->underscore($helperName));
 			$controller->helperName =& $helper;
 			$controller->view->helperRefs[$helperName] =& $helper;
 		}
@@ -304,7 +254,6 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 		return $controller;
 	}
 
-	//static
 	function __checkAction(&$controller, $actionName) {
 		if ($actionName == 'beforeAction' || $actionName == 'afterAction' || $actionName == 'url' ||
 			$actionName == 'render' || $actionName == 'renderPartial' || $actionName == 'redirect' ||
@@ -312,156 +261,69 @@ foreach (array_values($Dispatcher_componentRefs) as $c) {
 			$actionName == 'renderFileInline' || $actionName == 'renderFileAttachment' || $actionName == 'renderFile' ||
 			$actionName == 'ajaxSuccess' || $actionName == 'ajaxFailure'
 			) {
-			e('Reserved action names are not permitted');
-			die();
+			throw new Exception('Reserved action names are not permitted');
 		}
 	
 		// if the action starts with an underscore, a private/protected method is being attempted, which is not allowed
 		if (strpos($actionName, '_', 0) === 0) {
-			e('Private/protected actions are not permitted - TODO better error handling ;-)');
-			die();
+			throw new Exception('Private/protected actions are not permitted - TODO better error handling ;-)');
 		}
 		
 		// make sure the method exists
 		$methods = array_flip($controller->methods);
 		if (!isset($methods[$actionName])) {
 			$controllerClass = get_class($controller);
-			e("The <em>{$actionName}</em> action could not be found in the <em>{$controllerClass}</em> controller");
-			die();
+			throw new Exception("The {$actionName} action could not be found in the {$controllerClass} controller");
 		}
 	}
 	
-	//static
-	function &loadModel($modelName, $tableName) {
-		// the file name is the underscored model name
-		// the class name is the model name
-		
-		$m = null;
-		
-		// try to find the model in the app
-		$modelFilename = SLAB_APP.'/models/'.Inflector::underscore($modelName).'.php';
-		if (file_exists($modelFilename)) {
-			require_once($modelFilename);
-			if (!class_exists($modelName)) {
-				e("<p>The <em>$modelName</em> model could not be found at <code>$modelFilename</code></p>");
-				die();
-			}
-			$m = new $modelName();
-		} else {
-			// fall back on a vanilla Model instance
-			$m = new Model();
-			$m->modelName = $modelName;
-			$m->tableName = $tableName;
-		}
-		
-		// if the db component is loaded, add it to the model
-global $Dispatcher_componentRefs;
-		//if (isset(self::$componentRefs['db'])) {
-if (isset($Dispatcher_componentRefs['db'])) {
-			//$m->db =& self::$componentRefs['db'];
-$m->db =& $Dispatcher_componentRefs['db'];
-
-			// if configured, load model schemas
-			if (Config::get('app.load_model_schemas')) {
-				$m->loadSchema();
-			}
-		}
-		
-
-
-		return $m;
-	}
-
-	//static
 	function &loadComponent($componentName) {
-		//if (!empty(self::$componentRefs[$componentName])) {
-		global $Dispatcher_componentRefs;
-		if (!empty($Dispatcher_componentRefs[$componentName])) {
-			//return self::$componentRefs[$componentName];
-			return $Dispatcher_componentRefs[$componentName];
+		if (!empty($this->componentRefs[$componentName])) {
+			return $this->componentRefs[$componentName];
 		}
-	
-		$componentClass = Inflector::camelize($componentName).'Component';
 		
-		// first try to find the component in the app
-		$componentFilename = SLAB_APP.'/components/'.$componentName.'.php';
+		$componentFilename = SLAB_LIB.'/components/'.$componentName.'.php';
 		if (!file_exists($componentFilename)) {
-			// fall back to the core components
-			$componentFilename = SLAB_LIB.'/components/'.$componentName.'.php';
-			if (!file_exists($componentFilename)) {
-				$componentFilename = SLAB_APP.'/components/'.$componentName.'.php';
-				e("<p>The <em>$componentClass</em> component could not be found at <code>$componentFilename</code></p>");
-				die();
-			}
+			throw new Exception("Unknown component {$componentName} at {$componentFilename}, only built-in components are now supported");
 		}
 		
 		require_once($componentFilename);
-		
+
+		$inflector = new Inflector();
+		$componentClass = $inflector->camelize($componentName) . 'Component';
 		if (!class_exists($componentClass)) {
-			e("<p>The <em>$componentClass</em> component does not exist in <code>$componentFilename</code></p>");
-			die();
+			throw new Exception("The {$componentClass} component does not exist in {$componentFilename}");
 		}
 		
-		$component = new $componentClass;
-		
-		// init the component here, so that it only gets called once
+		$component = new $componentClass($this->config);
 		$component->init();
-		
-//		self::$componentRefs[$componentName] =& $component;
-$Dispatcher_componentRefs[$componentName] =& $component;
-		
+		$this->componentRefs[$componentName] =& $component;
+
 		return $component;
 	}
 	
-	//static
 	function &loadHelper($helperName) {
-		//if (!empty(self::$helperRefs[$helperName])) {
-		//	return self::$helperRefs[$helperName];
-global $Dispatcher_helperRefs;
-if (!empty($Dispatcher_helperRefs[$helperName])) {
-return $Dispatcher_helperRefs[$helperName];
+		if (!empty($this->helperRefs[$helperName])) {
+			return $this->helperRefs[$helperName];
 		}
-		
-		$helperClass = Inflector::camelize($helperName).'Helper';
-		
-		// first try to find the component in the app
-		$helperFilename = SLAB_APP.'/helpers/'.$helperName.'.php';
+
+		$helperFilename = SLAB_LIB.'/helpers/'.$helperName.'.php';
 		if (!file_exists($helperFilename)) {
-			// fall back to the core helpers
-			$helperFilename = SLAB_LIB.'/helpers/'.$helperName.'.php';
-			if (!file_exists($helperFilename)) {
-				$helperFilename = SLAB_APP.'/helpers/'.$helperName.'.php';
-				e("<p>The <em>$helperClass</em> helper could not be found at <code>$helperFilename</code></p>");
-				die();
-			}
+			throw new Exception("Unknown helper {$helperName} at {$helperFilename}, only built-in helpers are now supported");
 		}
-		
+
 		require_once($helperFilename);
-		
+
+		$inflector = new Inflector();
+		$helperClass = $inflector->camelize($helperName) . 'Helper';
 		if (!class_exists($helperClass)) {
-			e("<p>The <em>$helperClass</em> helper does not exist in <code>$helperFilename</code></p>");
-			die();
+			throw new Exception("The {$helperClass} helper does not exist in {$helperFilename}");
 		}
-		
-		$helper = new $helperClass;
-		
-		//self::$helperRefs[$helperName] = $helper;
-$Dispatcher_helperRefs[$helperName] = $helper;
-		
+
+		$helper = new $helperClass($this->config, $this);
+		$this->helperRefs[$helperName] =& $helper;
+
 		return $helper;
-	}
-	
-		
-	static function loadThirdParty($filename) {
-		$thirdPartyFilename = SLAB_APP.'/third_party/'.$filename.'.php';
-		if (!file_exists($thirdPartyFilename)) {
-			$thirdPartyFilename = SLAB_LIB.'/third_party/'.$filename.'.php';
-			if (!file_exists($thirdPartyFilename)) {
-				throw new Exception('The third party extension could not be found: '.$filename);
-			}
-		}
-		
-		require_once($thirdPartyFilename);
 	}
 };
 

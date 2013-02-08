@@ -1,10 +1,10 @@
 <?php
 
-$slabApplicationName = 'StubExample';
+$slabApplicationName = 'BootstrapExample';
 
 $config = new Config();
 
-$config->set('app.default_route', '/pages/index');
+$config->set('app.default_route', '/test/index');
 $config->set('app.default_components', array(/*'db', */'cookie', 'session', 'file'));
 $config->set('app.default_helpers', array('html', 'number'));
 $config->set('app.load_model_schemas', true);

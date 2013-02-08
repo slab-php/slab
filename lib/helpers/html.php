@@ -1,12 +1,14 @@
 <?php
-/* HtmlHelper
-** Some parts are from CodeIgniter
-** BJS20091004
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
+/* Some parts are from CodeIgniter */
 
 class HtmlHelper extends Helper {
-	var $name = 'HtmlHelper';
+	var $config = null;
+	var $dispatcher = null;
+
+	function __construct($config, $dispatcher) {
+		$this->config = $config;
+		$this->dispatcher = $dispatcher;
+	}
 	
 	function label($forId, $value) {
 		$value = h($value);
@@ -132,17 +134,15 @@ class HtmlHelper extends Helper {
 	}
 
 
-	// Wrapper for Dispatcher::url()
 	function url($u) {
-		return Dispatcher::url($u);
+		return $this->dispatcher->url($u);
 	}	
 	
 	// This is adapted from CodeIgniter
 	function headerStatus($code, $reason = null) {
 		// check the code
 		if ($code == '' || !is_numeric($code)) {
-			e('In HtmlHelper::headerStatus(), status codes must be numeric');
-			die();
+			throw new Exception("Status codes must be numeric - ({$code}) is invalid");
 		}
 		
 		// get the reason
@@ -150,8 +150,7 @@ class HtmlHelper extends Helper {
 			$reason = $this->headerStatusCodes[$code];
 		}
 		if ($reason == '') {
-			e('In HtmlHeader::headerStatus(), no status text is available for code '.$code);
-			die();
+			throw new Exception("No status text is available for status code {$code}");
 		}
 		
 		// CGI clients don't receive the HTTP/1.X header

@@ -1,9 +1,4 @@
 <?php
-/* ImageComponent
-** Image manipulation
-** BJS20100830
-** (CC A-SA) 2010 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 /*
 Example:
@@ -17,10 +12,14 @@ unset($this->data['Foo']['photo']);
 */
 
 class ImageComponent extends Component {
+	var $config = null;
+
+	function __construct($config) {
+		$this->config = $config;
+		ini_set('memory_limit', '64M');
+	}
 	
 	function init() {
-		// jack up the memory available to the script
-		ini_set('memory_limit', '64M');
 	}
 
 	// assuming JPEGs
@@ -140,4 +139,5 @@ class ImageComponent extends Component {
 		return $jpeg;
 	}
 }
+
 ?>
