@@ -22,7 +22,6 @@ require_once(SLAB_LIB.'/object.php');
 
 // load the Config class, then the initial configuration, then attempt to load the app config over the top
 require_once(SLAB_LIB.'/config.php');
-require_once(SLAB_LIB.'/init_config.php');
 if (file_exists(SLAB_APP.'/config.php')) {
 	require_once(SLAB_APP.'/config.php');
 } else {
@@ -55,9 +54,6 @@ require_once(SLAB_LIB.'/ajax_result.php');
 require_once(SLAB_LIB.'/file_result.php');
 require_once(SLAB_LIB.'/object_result.php');
 require_once(SLAB_LIB.'/controller_result.php');
-
-// init Security
-Security::init();
 
 // attempt to load the app AppController, otherwise fall back on the placeholder
 if (file_exists(SLAB_APP.'/app_controller.php')) {

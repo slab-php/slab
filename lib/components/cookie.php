@@ -1,12 +1,7 @@
 <?php
-/* /lib/components/cookie.php
-** CookieComponent, encapsulates cookie management
-** BJS20090404
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class CookieComponent extends Component {
-	// Fields
+	var $config = null;
 	var $cookieName = null;
 	var $expire = 0;	// the time that the cookie will expire. eg time()+60*60*24*30 will expire in 30 days. Set to 0 for a session cookie.
 	var $path = '';		// the path for the cookie is available at. Set to '/' to be available site-wide. By default it is accessible from the base url (usually '/')
@@ -15,15 +10,19 @@ class CookieComponent extends Component {
 	var $httponly = false;	// only in PHP 5.2 and above
 	var $useEncryption = true;
 	var $data = null;
+
+	function __construct($config) {
+		$this->config = $config;
+	}
 	
 	function init() {
-		$this->cookieName = Config::get('cookie.default_cookie_name');
-		$this->expire = Config::get('cookie.expire');
+		$this->cookieName = $this->config->get('cookie.default_cookie_name');
+		$this->expire = $this->config->get('cookie.expire');
 		$this->path = '/'; //Dispatcher::getBaseUrl();
-		$this->domain = Config::get('cookie.domain');
-		$this->secure = Config::get('cookie.secure');
-		$this->httponly = Config::get('cookie.httponly');
-		$this->useEncryption = Config::get('cookie.use_encryption');
+		$this->domain = $this->config->get('cookie.domain');
+		$this->secure = $this->config->get('cookie.secure');
+		$this->httponly = $this->config->get('cookie.httponly');
+		$this->useEncryption = $this->config->get('cookie.use_encryption');
 	}
 	
 	function initCookie() {

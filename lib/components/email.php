@@ -1,9 +1,4 @@
 <?php
-/* EmailComponent
-** Adds basic email send support
-** BJS20101031
-** (CC A-SA) 2010 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 /*
 Example:
@@ -21,9 +16,13 @@ If 'from' is not provided, 'to' is used as the from address.
 */
 
 class EmailComponent extends Component {
-	
-	function init() {
+	var $config = null;
+
+	function __construct($config) {
+		$this->config = $config;
 	}
+
+	function init() {}
 
 	function send($settings) {
 		extract($settings);
@@ -73,8 +72,6 @@ class EmailComponent extends Component {
 		}
 	}
 	
-	
-	
 	// check content for email header injection. The regex is copied from the intarwebz (http://snipplr.com/view/28723/check-for-email-header-injection/)
 	// cause I'm lazy.
 	function __checkForEmailHeaderInjection($content) {
@@ -85,4 +82,5 @@ class EmailComponent extends Component {
 		return !empty($_SERVER['HTTP_REFERER']) || !strContains($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']);
 	}
 }
+
 ?>

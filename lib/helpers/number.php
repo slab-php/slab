@@ -1,13 +1,14 @@
 <?php
-/* NumberHelper
-** This is based on CakePHP's NumberHelper class
-** BJS20090419
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-** Changes:
-*/
+/* This is based on CakePHP's NumberHelper class */
 
 class NumberHelper extends Helper {
-	var $name = 'NumberHelper';
+	var $config = null;
+	var $dispatcher = null;
+
+	function __construct($config, $dispatcher) {
+		$this->config = $config;
+		$this->dispatcher = $dispatcher;
+	}
 
 	// From CakePHP:
 	/**

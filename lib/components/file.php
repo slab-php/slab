@@ -1,25 +1,23 @@
 <?php
-/* /lib/components/file.php
-** FileComponent, encapsulates some methods for working with disk files
-** Contains some inspiration from CodeIgniter
-** BJS20090406
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-** Changes:
-*/
 
 class FileComponent extends Component {
-	// Fields
-	
-	
+	var $config = null;
+
+	function __construct($config) {
+		$this->config = $config;
+	}
+
 	function init() {
-	}		
+	}
+
 	function beforeAction() {
 	}	
+	
 	function afterAction() {
 	}
+	
 	function shutdown() {
 	}
-	
 	
 	// wrapper for file_exists()
 	function exists($filename) {

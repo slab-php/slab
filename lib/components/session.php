@@ -1,17 +1,7 @@
 <?php
-/* /lib/components/session.php
-** SessionComponent, allows persistent sessions
-** Sessions can be persisted to disk in a temp file, to a database table, or to the cookie.
-** At the moment only cookie and file based sessions are supported.
-** Disk and database sessions will have a session id saved to the cookie (recommended), or possibly to the url
-** BJS20090405
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-** Changes:
-** BJS20090830 added check()
-*/
 
 class SessionComponent extends Component {
-	// Config:
+	var $config = null;
 	var $sessionCookieName = null;	// the name used for the session cookie
 	var $sessionTimeout = 0;	// the time that a session will last for from the last activity (in seconds). Note that the cookie expire time may be less than this.
 	var $sessionType = null;	// 'file' | 'database' | 'cookie'
@@ -22,19 +12,21 @@ class SessionComponent extends Component {
 	var $data = array();
 	var $inSession = false;
 	var $sessionID = null;
-	
+
+	function __construct($config) {
+		$this->config = $config;
+	}	
 	
 	function init() {
-		$this->sessionCookieName = Config::get('session.cookie_name');
-		$this->sessionTimeout = Config::get('session.timeout');
-		$this->sessionType = Config::get('session.type');
-		$this->sessionIDType = Config::get('session.id_type');
-		$this->sessionDatabaseTable = Config::get('session.database_table');
-		$this->sessionFilenamePrefix = Config::get('session.filename_prefix');		
+		$this->sessionCookieName = $this->config->get('session.cookie_name');
+		$this->sessionTimeout = $this->config->get('session.timeout');
+		$this->sessionType = $this->config->get('session.type');
+		$this->sessionIDType = $this->config->get('session.id_type');
+		$this->sessionDatabaseTable = $this->config->get('session.database_table');
+		$this->sessionFilenamePrefix = $this->config->get('session.filename_prefix');		
 	}
 		
 	function beforeAction() {
-		// check that the required controllers are loaded
 		if ($this->sessionType == 'cookie' || $this->sessionIDType == 'cookie') {
 			if (empty($this->controller->Cookie)) {
 				e('Cookie-based sessions require the Cookie component to be loaded');
@@ -42,6 +34,8 @@ class SessionComponent extends Component {
 			}
 		}
 		if ($this->sessionType == 'database') {
+			throw new Exception('Database-persisted sessions are not implemented yet');
+
 			if (empty($this->controller->Db)) {
 				e('Database-persisted sessions require the Db component to be loaded');
 				die();
@@ -154,11 +148,10 @@ class SessionComponent extends Component {
 		}
 		
 		if ($this->sessionIDType == 'cookie' || $this->sessionType == 'cookie') {
-			// delete the session id (and data if it's there) from the cookie
 			$this->controller->Cookie->remove($this->sessionCookieName);
 		}
 		if ($this->sessionType == 'database') {
-			// delete the session data from the database
+			// TODO delete the session data from the database
 		} else if ($this->sessionType == 'file') {
 			// delete the temp file containing the session data
 			$this->controller->File->remove($this->__getSessionFilename());
@@ -224,4 +217,5 @@ class SessionComponent extends Component {
 		}
 	}
 }
+
 ?>

@@ -1,20 +1,10 @@
 <?php
-/* controller.php
-** Base class for controllers
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class Controller extends Object {
-	var $name = null;			// the name of the controller, override this in the implementation, eg 'TestController'
-	var $models = array();		// models used in the controller, as ('[ModelName]' => '[table_name]'), eg ('MyModel' => 'my_model')
-	var $components = array();	// components available to the controller, override this in the implementation, eg ('db', 'security', 'file')
-	var $helpers = array();		// helpers available to the view, override this in the implementation, eg ('html', 'number')
-	
 	var $actionName = '';		// the name of the current action, this is set by the dispatcher
 	var $params = array();		// the parameters passed to the action from the /c/a/p url, this is set by the dispatcher
 	
 	var $methods = array();			// methods in the controller, used to check actions in Dispatcher. Set in Controller::__construct().
-	var $modelRefs = array();		// references to all models, set in Dispatcher::loadController()
 	var $componentRefs = array();	// references to all components, set in Dispatcher::loadController()
 	
 	var $data = array();		// the incoming request values (combines $_REQUEST and $_FILES into one fruity cocktail)
@@ -22,9 +12,10 @@ class Controller extends Object {
 	var $view = null;			// instance of a view
 	
 	var $actionResult = null;
+	var $dispatcher = null;
 	
-	
-	function __construct() {
+	function __construct($dispatcher) {
+		$this->dispatcher = $dispatcher;
 		$this->view = new View($this);
 	
 		// get the methods used in the controller
