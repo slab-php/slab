@@ -16,6 +16,10 @@ Helpers are included directly in the scope of each view. There are two helpers: 
 
 #### `$html`
 
+Most of the html methods relate to creating inputs which can be a bit verbose. These are most handy with the `select` statements where the options could come from a database, so it would save a lot of boilerplate code.
+
+The most used method is `url()`, which is the recommended method for producing a relative URL to either a controller action or a static file.
+
 ##### url
 
 `url($u)`: Wraps `dispatcher->url` which returns either a relative path to a static file or a path to a controller action, optionally using url rewriting for pretty, SEO friendly URLs if enabled (default), optionally including a session ID if the session ID is persisted via the URL.
@@ -28,8 +32,6 @@ For example, if the site is hosted at `www.domain.com/some/application/`, `url('
 - `/some/application/slab.php?url=/pages/home&session_id=HASH`
 
 If there exists a file at `www.domain.com/some/application/images/header.jpg`, `url('/images/header.jpg')` would return `/some/application/images/header.jpg`.
-
-`$html->url('...')` is therefore the recommended method for producing a relative URL to either a controller action or a static file.
 
 
 ##### markdown
