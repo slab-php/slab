@@ -12,8 +12,9 @@ class RedirectResult extends ActionResult {
 	}
 	
 	function render() {
+		global $dispatcher;
 		header('Status: 302');
-		header('Location: '.Dispatcher::url($this->url));
+		header('Location: '.$dispatcher->url($this->url));
 	}
 	
 	function renderToString() {
