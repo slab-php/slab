@@ -16,7 +16,7 @@ Helpers are included directly in the scope of each view. There are two helpers: 
 
 #### `$html`
 
-Methods:
+##### url
 
 `url($u)`: Wraps `dispatcher->url` which returns either a relative path to a static file or a path to a controller action, optionally using url rewriting for pretty, SEO friendly URLs if enabled (default), optionally including a session ID if the session ID is persisted via the URL.
 
@@ -32,8 +32,12 @@ If there exists a file at `www.domain.com/some/application/images/header.jpg`, `
 `$html->url('...')` is therefore the recommended method for producing a relative URL to either a controller action or a static file.
 
 
+##### markdown
+
 `markdown($markdownText)`: passes the [Markdown](http://daringfireball.net/projects/markdown/) formatted input through [Markdown Extra](http://michelf.com/projects/php-markdown/) and returns the resultant HTML
 
+
+##### label
 
 `label($forId, $value)`: Returns a HTML `label` element. Eg.:
 
@@ -43,6 +47,8 @@ results in:
 
 	<p><label for='data[name]'>Name:</label></p>
 
+
+##### inputHidden
 
 `inputHidden($params)`: returns a hidden input element. Params is an array containing optionally `name`, `id` and `value`. Eg:
 
@@ -56,6 +62,8 @@ results in:
 
 	<form><label type='hidden' name='data[name]' id='name_element' value='Steve' /></form>
 
+
+##### input, inputText, inputUrl, inputFile
 
 `input($params)` also `inputText` `inputUrl` and `inputFile`: returns an input with an optional label. Params is an array containing optionally `name`, `id`, `value`, `label`, `type`. If `label` is not included or is null, no label will be output. The `inputText`, `inputUrl` and `inputFile` methods include the `type` value. Eg:
 
@@ -72,8 +80,12 @@ results in:
 	<form><label for='name_element'>Name:</label> <input type='text' name='data[name]' id='name_element' value='Adam' /></form>
 
 
+##### textarea
+
 `textarea($params)`: returns a `textarea`. Params is an array containing optionally `name`, `id`, `value`, `label`, `rows` (default to 8) and `cols` (default to 80).
 
+
+##### select
 
 `select($params)`: returns a `select` element. Params is an array containing optionally `name`, `id`, `options`, `current` and `label`. Eg:
 
@@ -106,6 +118,8 @@ results in (reformatted):
     </p>
 
 
+##### selectIntFromRange
+
 `selectIntFromRange($name, $id, $from, $to, $current)`: eg.:
 
     <?php e($html->selectIntFromRange('age', 'age', 0, 100, 32)); ?>
@@ -120,7 +134,12 @@ results in (reformatted):
     </select>
 
 
+##### headerStatus
+
 `headerStatus($code, $reason = null)`: Sets the HTTP header status. If the reason is not provided it uses a lookup table for standard HTTP status codes. Eg: `$html->headerStatus(501);` may result in `header('HTTP/1.1 501 Not Implemented');`.
+
+
+##### headerNoCache
 
 `headerNoCache()`: Writes the headers required to trigger `no-cache` for Internet Explorer.
 
