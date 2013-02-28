@@ -13,12 +13,15 @@ class Component extends Object {
 	// This is where configuration can be loaded
 	function init() {
 	}
-	// This gets called after afterAction
-	function shutdown() {}
 	
 	// These get called immediately before and after the action is executed.
 	// When beforeAction() is called, all other components should be initialised and usable
 	function beforeAction() {}
+	function beforeFilter() {}
 	function afterAction() {}
+	function afterFilter() {}
+
+	// This gets called after afterAction and afterFilter
+	function shutdown() {}
 }
 ?>

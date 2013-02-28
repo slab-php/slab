@@ -60,11 +60,10 @@ class Model extends Object {
 		);
 	}
 	
-	function findAllByQuery($sql) { return $this->loadAllByQuery($sql); }
-	function getAllByQuery($sql) { return $this->loadAllByQuery($sql); }
-	function loadAllByQuery($sql) {
-		return $this->database->query($sql);
-	}
+	function findAllByQuery($sql) { return $this->database->query($sql); }
+	function getAllByQuery($sql) { return $this->database->query($sql); }
+	function loadAllByQuery($sql) { return $this->database->query($sql); }
+	function query($q) { return $this->database->query($sql); }
 	
 	// find the first model matching the conditions
 	function findFirst($conditions=null, $fields=null, $order=null) { return $this->loadFirst($conditions, $fields, $order); }
@@ -240,9 +239,6 @@ class Model extends Object {
 		return $result[0]['row_count'];
 	}
 	
-	function query($q) { 
-		return $this->database->query($q);
-	}
 	
 	// Escape the given data for use in a SQL statement. If the field name is provided the
 	// database type of the field is used for escaping the data.

@@ -35,6 +35,8 @@ class Controller extends Object {
 	// in a normal controller, the first statement _must_ be parent::beforeAction() or parent::afterAction()
 	function beforeAction() {}
 	function afterAction() {}
+	function beforeFilter() {}
+	function afterFilter() {}
 	
 	// Helper methods
 	function url($u) {

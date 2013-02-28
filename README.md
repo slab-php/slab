@@ -52,6 +52,15 @@ Returns the last error generated in the current database connection.
 `count($conditions = null)`: returns the count of rows that satisfy the condition - either a string `WHERE` clause or an `AND`ed key/value array.
 
 
+### Controllers
+
+#### beforeAction / beforeFilter
+`beforeAction()` and `beforeFilter()` are called (in that order) _after_ the cookie and components are added and intialised just prior to dispatching the action method. This is a good spot to initialise any services used by the controller or to call `__authenticate()` in controllers that have security concerns.
+
+#### afterAction / afterFilter
+`afterAction()` and `afterFilter()` are called (in that order) immediately after calling the action method and ensuring that the view (or `actionResult`) is set.
+
+
 ### Helpers
 
 Helpers are included directly in the scope of each view. There are two helpers: `$html` and `$number`. They can be used in the view like so:
@@ -190,6 +199,24 @@ results in (reformatted):
 
 `headerNoCache()`: Writes the headers required to trigger `no-cache` for Internet Explorer.
 
+
+### Components
+Components are used in controllers. There are several built-in controllers, all of which subclass `Component`. Each component has an `init()` method that is called before the component's `beforeAction()` and `beforeFilter()` methods. Then after the action method is dispatched and the controller's `afterAction()` and `afterFilter()` methods are called, the component's `afterAction()` anf `afterFilter()` methods are called, followed by the component's `shutdown()` method.
+
+`beforeAction()` and `beforeFilter()` should be considered synonyms for convenience and probably shouldn't both be implemented in the same component. Likewise `afterAction()` and `afterFilter()` should be considered convenience synonyms.
+
+Components are available in each controller's class-wide scope, so within a controller action method:
+
+    function some_action() {
+    	$this->file->write('/temp/foo.txt', 'some text');
+    }
+
+#### Cookie
+#### Db
+#### Email
+#### File
+#### Image
+#### Session
 
 ## License
 

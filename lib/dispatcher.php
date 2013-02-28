@@ -138,13 +138,15 @@ class Dispatcher extends Object {
 			$controller->Cookie->initCookie();
 		}
 				
-		// call the components beforeAction
+		// call the components beforeAction and befireFilter
 		foreach (array_keys($controller->componentRefs) as $k) {
 			$controller->componentRefs[$k]->beforeAction();
+			$controller->componentRefs[$k]->beforeFilter();
 		}
 
 		try {
 			$controller->beforeAction();
+			$controller->beforeFilter();
 			$controller->dispatchMethod($actionName, $params);
 			if (empty($controller->actionResult)) {
 				// if the controller's actionResult isn't set, this means that the action didn't execute a view method,
@@ -152,13 +154,15 @@ class Dispatcher extends Object {
 				$controller->view();
 			}
 			$controller->afterAction();
+			$controller->afterFilter();
 		} catch (Exception $ex) {
 			$controller->ajaxError($ex->getMessage());
 		}
 		
-		// call the components afterAction
+		// call the components afterAction and afterFilter
 		foreach (array_values($controller->componentRefs) as $c) {
 			$c->afterAction();
+			$c->afterFilter();
 		}
 		
 		return $controller;
