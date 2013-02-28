@@ -325,6 +325,13 @@ class Dispatcher extends Object {
 
 		return $helper;
 	}
+
+	function &loadModel($tableName, $primaryFieldName = 'id') {
+		$db = $this->loadComponent('db');
+		$model = new Model($db, $tableName, $primaryFieldName);
+
+		return $model;
+	}
 };
 
 ?>

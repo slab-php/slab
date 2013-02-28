@@ -19,11 +19,11 @@ class Model extends Object {
 	
 	function create() {
 		$model = array();
+
 		foreach ($this->schema as $col => $colSchema) {
 			if (!isset($colSchema['default'])) continue;
 			$model[$col] = $colSchema['default'];
 		}
-		$model = array($this->modelName => $model);
 
 		return $model;
 	}
@@ -43,40 +43,27 @@ class Model extends Object {
 			$this->primaryFieldName.'='.$this->escape($id, $this->primaryFieldName)
 			);
 		
-		if (count($result) == 0) {
-			return null;
-		}
-		return array($this->modelName=>$result[0]);
+		if (count($result) == 0) return null;
+
+		return $result[0];
 	}
 	
 	// find all models matching the conditions
 	function findAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
 	function getAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
 	function loadAll($conditions=null, $fields=null, $order=null) {
-		$results = $this->database->select(
+		return $this->database->select(
 			$this->tableName,
 			$fields,
 			$conditions,
 			$order
-			);
-
-		$results2 = array();
-		foreach ($results as $r) {
-			$results2[] = array($this->modelName => $r);
-		}
-		
-		return $results2;
+		);
 	}
 	
 	function findAllByQuery($sql) { return $this->loadAllByQuery($sql); }
 	function getAllByQuery($sql) { return $this->loadAllByQuery($sql); }
 	function loadAllByQuery($sql) {
-		$results = $this->database->query($sql);
-		$results2 = array();
-		foreach ($results as $r) {
-			$results2[] = array($this->modelName => $r);
-		}
-		return $results2;
+		return $this->database->query($sql);
 	}
 	
 	// find the first model matching the conditions
@@ -90,16 +77,16 @@ class Model extends Object {
 			$order,
 			null,
 			'1');
-		if (count($result) > 0) {
-			return array($this->modelName => $result[0]);
-		}
-		return null;
+
+		if (count($result) == 0) return null;
+
+		return $result[0];
 	}
 	
 	// find the first model by the given key and value, or an array of key/values in $key
-	function findatabasey($key, $val=null) { return $this->loadatabasey($key, $val); }
-	function getBy($key, $val=null) { return $this->loadatabasey($key, $val); }
-	function loadatabasey($key, $val=null) {
+	function findBy($key, $val=null) { return $this->loadBy($key, $val); }
+	function getBy($key, $val=null) { return $this->loadBy($key, $val); }
+	function loadBy($key, $val=null) {
 		$condition = '';
 		
 		if (!is_array($key)) {
@@ -167,9 +154,6 @@ class Model extends Object {
 			throw new Exception('Data to save must be an array');
 		}
 	
-		if (isset($data[$this->modelName])) {
-			$data = $data[$this->modelName];
-		}
 		$data = $this->escape($data);
 		
 		foreach ($data as $k=>$v) {
@@ -206,22 +190,12 @@ class Model extends Object {
 	}
 	
 	
-	// remove(), del() and delete() are synonyms, delete the specified model
-	// (or the model specified by $this->id if $id is not set)
-	// The model (as in $model['Model']['id']) can be passed in instead of just the id
-	function remove($id = null) { return $this->delete($id); }
-	function del($id = null) { return $this->delete($id); }
-	function delete($id = null) {
-		if (empty($id)) {
-			$id = $this->id;
-		}
-
-		// This allows the model instance itself to be passed to del()
-		if (is_array($id) && isset($id[$this->modelName]) && isset($id[$this->modelName][$this->primaryFieldName])) {
-			$id = $id[$this->modelName][$this->primaryFieldName];
-		}
-		$this->id = $id;
-		return $this->database->delete($this->tableName, $this->primaryFieldName.'='.$this->escape($this->id, $this->primaryFieldName));
+	function remove($id) { return $this->delete($id); }
+	function del($id) { return $this->delete($id); }
+	function delete($id) {
+		return $this->database->delete(
+			$this->tableName, 
+			$this->primaryFieldName.'='.$this->escape($id, $this->primaryFieldName));
 	}
 	
 	// removeAll(), delAll() and deleteAll() are synonyms, delete the models specified
@@ -266,7 +240,6 @@ class Model extends Object {
 		return $result[0]['row_count'];
 	}
 	
-	// Just calls $this->database->query()
 	function query($q) { 
 		return $this->database->query($q);
 	}

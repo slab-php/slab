@@ -48,14 +48,16 @@ class CookieComponent extends Component {
 	// The cookie that gets is named data[$this->cookieName][$name]
 	// If $value is an array, setCookie() recursively processes $value into data[$this->cookieName][$name]
 	// When the cookie is returned, the value will be accessible via $this->data[$name]
-	function set($name, $value='', $prefix=null) {
+	function set($name, $value = '', $prefix = null) {
+		$security = new Security($this->config);
+
 		if (empty($prefix)) {
 			$prefix = $this->cookieName;
 		}
 
 		if (!is_array($value)) {
 			if ($this->useEncryption) {
-				$value = Security::encode($value);
+				$value = $security->encode($value);
 			}
 		
 			if (version_compare(PHP_VERSION, '5.2', '>=')) {
@@ -129,6 +131,8 @@ class CookieComponent extends Component {
 	
 	// Private method used by beforeFilter() to recursively decrypt $this->data
 	function __decryptData($arr = null) {
+		$security = new Security($this->config);
+
 		if (empty($arr)) {
 			$arr =& $this->data;
 		}
@@ -138,7 +142,7 @@ class CookieComponent extends Component {
 		
 		foreach ($arr as $k=>$v) {
 			if (!is_array($v)) {
-				$arr[$k] = Security::decrypt($v);
+				$arr[$k] = $security->decrypt($v);
 			} else {
 				$arr[$k] = $this->__decryptData($v);
 			}

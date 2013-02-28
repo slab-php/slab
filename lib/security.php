@@ -20,7 +20,7 @@ class Security extends Object {
 	var $config = null;
 	
 	function __construct($config) {
-		$this->config = config;
+		$this->config = $config;
 		$this->__encryptionKey = md5($this->config->get('security.encryption_key'));
 		$this->__mcryptExists = function_exists('mcrypt_encrypt');
 		$this->__sha1Exists = function_exists('sha1');
@@ -44,7 +44,7 @@ class Security extends Object {
 	function encrypt($data) { return $this->encode($data); }
 	function encode($data) {
 		// xor and encode the data and the encryption key
-		$result = $this->__xorEncode($data, $_Security__encryptionKey);
+		$result = $this->__xorEncode($data, $this->__encryptionKey);
 
 		// if configured and supported, mcrypt encode the data as well (using Rijndael256)
 		if ($this->config->get('security.use_mcrypt') && $this->__mcryptExists) {

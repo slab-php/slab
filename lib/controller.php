@@ -120,7 +120,7 @@ class Controller extends Object {
 	}
 	// excute another action and use the result of that action for this action (nested dispatch)
 	function action($cap, $data = null) {
-		$this->actionResult = Dispatcher::dispatch($cap, $data);
+		$this->actionResult = $this->dispatcher->dispatch($cap, $data);
 	}
 	function objectResult($obj) {
 		$this->actionResult = new ObjectResult($obj);
@@ -134,7 +134,7 @@ class Controller extends Object {
 	// Preferred method is to "return redirect('url')" inside the action.
 	function redirectImmediate($u) {
 		header('Status: 200');
-		header('Location: '.Dispatcher::url($u));
+		header('Location: '.$this->dispatcher->url($u));
 		die();
 	}
 };
