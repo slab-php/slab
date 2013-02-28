@@ -7,6 +7,51 @@ Slab is/was an MVC framework inspired by CakePHP and CodeIgniter, but I actually
 
 ## Views
 
+### Models
+
+The `Model` class in Slab is a wrapper around a simple database access layer. Generally services receive an instance of the `Model` class which has been initialised with a connection to the database and the name of the underlying table. The database schema is also loaded and used to escape fields. The `Model` class then provides methods that hide some of the complexity of querying the underlying table and provide typed and parameterised `INSERT` and `UPDATE` methods. The database is never too far under the surface though: `$foos = $model->findAllByQuery("SELECT * FROM Foos WHERE name = 'Ben'")` goes straight to the database and returns an array of hash arrays: `$foos[0]['name'] == 'Ben'`.
+
+#### getLastError
+Returns the last error generated in the current database connection.
+
+#### find / get / load
+`find($id = null, $fields = null)`: Find the first model using `$id` against the default primary field name. `$fields` is an optional parameter which is an array of fields to include in the resulting model. If the value for `$id` is not provided or is null, `$model->id` is used instead (**although this is not recommended and will be deprecated and removed (#16) in a future version**).
+
+#### findAll / getAll / loadAll
+`findAll($conditions = null, $fields = null, $order = null)`:
+
+- `$conditions` is an optional string containing the `WHERE` clause
+- `$fields` is an optional array of the field names to return
+- `$order` is an optional string containing the `ORDER BY` clause
+
+#### findAllByQuery / getAllByQuery / loadAllByQuery / query
+`findAllByQuery($sql)`: directly executes the SQL on the database and returns an array of hash arrays.
+
+#### findBy / getBy / loadBy
+`loadBy($key, $val)`: Find the first model by the given key and value. If the `$key` and `$val` are arrays they are ANDed together: `loadBy(array('key1', 'key2'), array(1, '2'))`. If no results are found returns `null`.
+
+#### findAllBy / getAllBy / loadAllBy
+`findAllBy($key, $val = null, $fields = null, $order = null)`: returns all models matching the given key and value. `$key` can also be an array of key/values, eg: `$model->findAllBy(array('name' => 'Ben', 'age' => '32))`.
+
+#### save
+`save($data)`: saves the data to the database (in the configured table). If `$data` includes the primary field, performs an `UPDATE` otherwise performs an `INSERT` and returns the ID (the value of `mysql_insert_id()`).
+
+#### updateField
+`updateField($fieldName, $fieldData)`: updates a single field to the model identified by `$this->id`. **This will be deprecated and an `id` field added to the method: `updateField($id, $fieldName, $fieldData)` (#16).
+
+#### remove / del / delete
+`remove($id)`: deletes the row with the given ID.
+
+#### removeAll / delAll / deleteAll
+`removeAll($conditions = null)`: deletes all rows that meet the given conditions (either a  string `WHERE` clause or an array of key/values which are `AND`ed together) or all rows if no condition is provided.
+
+#### exists
+`exists($id = null, $conditions = null)`: returns whether the model specified by the given ID exists or if one or more models exist in the database that satisfy the given conditions  - either a string `WHERE` clause or an `AND`ed key/value array.
+
+#### count
+`count($conditions = null)`: returns the count of rows that satisfy the condition - either a string `WHERE` clause or an `AND`ed key/value array.
+
+
 ### Helpers
 
 Helpers are included directly in the scope of each view. There are two helpers: `$html` and `$number`. They can be used in the view like so:
