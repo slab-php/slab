@@ -1,6 +1,8 @@
 <?php
 /* Some parts are from CodeIgniter */
 
+require_once(SLAB_LIB.'/third_party/markdown.php');
+
 class HtmlHelper extends Helper {
 	var $config = null;
 	var $dispatcher = null;
@@ -8,6 +10,10 @@ class HtmlHelper extends Helper {
 	function __construct($config, $dispatcher) {
 		$this->config = $config;
 		$this->dispatcher = $dispatcher;
+	}
+
+	function markdown($markdown) {
+		return Markdown($markdown);
 	}
 	
 	function label($forId, $value) {
