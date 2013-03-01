@@ -73,8 +73,8 @@ class View extends Object {
 		// Extract the helpers
 		extract($this->helperRefs);
 		
-		// manually put $this->pageTitle into the local scope (it will be assigned back after including the file)
 		$pageTitle = $this->pageTitle;
+		$dispatcher = $this->controller->dispatcher;
 		
 		// include the file in the context of this method and store the output
 		// ob_clean() issues a notice if no buffer to delete

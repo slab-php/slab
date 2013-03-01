@@ -3,18 +3,12 @@
 class Dispatcher extends Object {
 	var $componentRefs = array();
 	var $helperRefs = array();
-	var $baseUrl = '';
 	var $config = null;
 
 	function __construct($config) {
 		$this->config = $config;
 	}
 
-	//static
-	function getBaseUrl() {
-		return $this->baseUrl;
-	}
-	
 	function getFilename($filename) {
 		return dirname(SLAB_ROOT).$filename;
 	}
@@ -67,13 +61,27 @@ class Dispatcher extends Object {
 	// Parses the given /c/a/p triad, finds loads and executes the appropriate controller, and returns the result of rendering the view
 	// This has an optional $data param, this is an assoc array that is merged into the controller's data. This lets an action dispatch and
 	// return another action like: $this->actionResult = Dispatcher::dispatch('/c/a/p', array('key'=>'value'));
-	//static
 	function dispatch($cap = null, $data = null) {
+		$controller = $this->__innerDispatch($cap, $data);
+		
+		if (empty($controller->actionResult)) {
+			$controller->view();
+		}
+
+		return $controller->actionResult;
+	}
+
+	function partial($cap = null, $data = null) {
+		$controller = $this->__innerDispatch($cap, $data);
+		$controller->partial();
+		return $controller->actionResult->renderToString();
+	}
+
+	function __innerDispatch($cap, $data) {
 		$controllerName = '';
 		$actionName = '';
 		$params = array();
 		
-		$this->baseUrl = dirname(env('PHP_SELF'));
 
 		// If the cap triad is empty, fall back to the REQUEST url, then to the default route
 		if (empty($cap)) {
@@ -126,11 +134,6 @@ class Dispatcher extends Object {
 			$controller->beforeAction();
 			$controller->beforeFilter();
 			$controller->dispatchMethod($actionName, $params);
-			if (empty($controller->actionResult)) {
-				// if the controller's actionResult isn't set, this means that the action didn't execute a view method,
-				// so just default to $controller->view()
-				$controller->view();
-			}
 			$controller->afterAction();
 			$controller->afterFilter();
 		} catch (Exception $ex) {
@@ -142,8 +145,8 @@ class Dispatcher extends Object {
 			$c->afterAction();
 			$c->afterFilter();
 		}
-		
-		return $controller->actionResult;
+
+		return $controller;
 	}
 
 	function shutdown() {
@@ -152,9 +155,6 @@ class Dispatcher extends Object {
 		}
 	}
 
-	function __innerDispatch($cap = null, $data = null) {
-	}
-		
 	function &loadController($controllerName, $actionName, $params, $data = null) {
 		$inflector = new Inflector();
 

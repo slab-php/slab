@@ -14,7 +14,7 @@ Views are PHP files that are included in the `View::__render` method. In the sco
 - Anything set in the controller using the `set` method is first class, so if the controller action method uses `$this->set('foos', $this->fooService->getFoos());` the view will be able to do something like `<?php foreach ($foos as $foo): ?>...<?php endforeach; ?>`
 
 ### Partials / subviews
-A partial view is broduced by a controller action that returns `$this->partial()`, which is a `PartialView`. Calling `$view->renderToString` then returns a string which can be displayed in the containing view. So I might have an item view partial in `controllers/my_item_controller.php`:
+A partial view is produced by a controller action that returns `$this->partial()`, which is a `PartialView`. Calling `$view->renderToString` then returns a string which can be displayed in the containing view. So I might have an item view partial in `controllers/my_item_controller.php`:
 
     function item_view($id) {
     	$this->set('item', $this->itemService->get($id));
@@ -32,8 +32,23 @@ A main view then uses the partial in a loop:
     	<?php foreach ($items as $item): ?>
 			<?php e($dispatcher->dispatch("/my_item/item_view/{$item['id']}")->renderToString()); ?>
         <?php endforeach; ?>
-    <ul>
+    </ul>
 
+#### Shortcut method for consuming partials
+`Dispatcher` includes a `partial()` method which returns the string result of the partial view. It also ensures the partial view is used by calling `$controller->partial()`. This results in a simplified shortcur method for creating and using partials. So the partial view action in `controllers/my_item_controller.php` is:
+
+    function item_view($id) {
+        $this->set('item', $this->itemService->get($id));
+    }
+
+The partial is used in another view as follows:
+
+    <h1>Items:</h1>
+    <ul>
+		<?php foreach ($items as $item): ?>
+			<?php e($dispatcher->partial("/my_item/item_view/{$item['id']}")); ?>
+		<?php endforeach; ?>
+	</ul>
 
 
 ## Models

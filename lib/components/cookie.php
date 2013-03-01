@@ -18,7 +18,7 @@ class CookieComponent extends Component {
 	function init() {
 		$this->cookieName = $this->config->get('cookie.default_cookie_name');
 		$this->expire = $this->config->get('cookie.expire');
-		$this->path = '/'; //Dispatcher::getBaseUrl();
+		$this->path = '/';
 		$this->domain = $this->config->get('cookie.domain');
 		$this->secure = $this->config->get('cookie.secure');
 		$this->httponly = $this->config->get('cookie.httponly');
