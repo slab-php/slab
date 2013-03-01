@@ -136,6 +136,9 @@ class Controller extends Object {
 	function controllerResult($controller) {
 		$this->actionResult = new ControllerResult($controller);
 	}
+	function physicalFile($filename) {
+		return $this->fileInline($filename, $this->file->read($filename));
+	}
 	
 	// This should only be used outside of a controller action as it is a dirty way of redirecting.
 	// It dies after setting the header so cookies won't be saved etc

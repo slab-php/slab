@@ -53,7 +53,7 @@ class Dispatcher extends Object {
 		return $newUrl;
 	}
 	
-	// url() returns a URL absolute to /, absoluteUrl() includes the scheme and host name (like 'http://www.example.com/c/a/p')
+	// url() returns a URL relative to /, absoluteUrl() includes the scheme and host name (like 'http://www.example.com/c/a/p')
 	function absoluteUrl($cap) {
 		return 'http://'.env('HTTP_HOST').$this->url($cap);
 	}
@@ -159,9 +159,12 @@ class Dispatcher extends Object {
 		$inflector = new Inflector();
 
 		$className = $inflector->camelize($controllerName).'Controller';
+		if ($className == 'SlabInternalsController') {
+			$filename = SLAB_LIB.'/controllers/slab_internals_controller.php';
+		} else {
+			$filename = SLAB_APP.'/controllers/'.$controllerName.'_controller.php';
+		}
 
-		// try to load from the app
-		$filename = SLAB_APP.'/controllers/'.$controllerName.'_controller.php';
 		if (!file_exists($filename)) {
 			throw new Exception("The {$className} controller could not be found at {$filename}");
 		}
@@ -322,6 +325,11 @@ class Dispatcher extends Object {
 		$model = new Model($db, $tableName, $primaryFieldName);
 
 		return $model;
+	}
+
+	function handleException($ex) {
+		e($this->partial('/slab_internals/show_exception', array('ex' => $ex)));
+		die();
 	}
 };
 
