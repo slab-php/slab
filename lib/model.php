@@ -11,6 +11,8 @@ class Model extends Object {
 		$this->database = $database;
 		$this->tableName = $tableName;
 		$this->primaryFieldName = $primaryFieldName;
+
+		$this->schema = $this->database->getTableSchema($this->tableName);
 	}	
 
 	function getLastError() {
@@ -290,11 +292,6 @@ class Model extends Object {
 		}
 
 		return $this->database->makeValueSafe($value);
-	}
-	
-	// Load the schema from the database
-	function loadSchema() {
-		$this->schema = $this->database->getTableSchema($this->tableName);
 	}
 };
 
