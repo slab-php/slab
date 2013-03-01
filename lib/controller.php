@@ -112,19 +112,19 @@ class Controller extends Object {
 		$this->actionResult = new FileResult($filename, $data, $encoding, 'attachment');
 	}
 	function ajax($statusCode, $data = null) {
-		$this->actionResult = new AjaxResult($statusCode, $data);
+		$this->actionResult = new AjaxResult($statusCode, $data, $this->dispatcher);
 	}
 	function ajaxSuccess($data = null) {
-		$this->actionResult = new AjaxResult(200, $data);
+		$this->actionResult = new AjaxResult(200, $data, $this->dispatcher);
 	}
 	function ajaxFailure($data = null) {
-		$this->actionResult = new AjaxResult(500, $data);
+		$this->actionResult = new AjaxResult(500, $data, $this->dispatcher);
 	}
 	function ajaxError($data = null) {
 		$this->ajaxFailure($data);
 	}
 	function fileNotFound() {
-		$this->actionResult = new AjaxResult(404, null);
+		$this->actionResult = new AjaxResult(404, null, $this->dispatcher);
 	}
 	// excute another action and use the result of that action for this action (nested dispatch)
 	function action($cap, $data = null) {
