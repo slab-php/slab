@@ -100,11 +100,17 @@ Returns the last error generated in the current database connection.
 
 ## Controllers
 
+### Action names
+The action is found from the request path (`/controller/action/parameters`) and is matched to a method in the relevant controller ("dispatched"). Action names that start with double-underscores (eg. `function __authenticate() {...}`). This is to allow 'private' methods that cannot be accessed by the Slab dispatch process. Action names can start with a single underscore which is used as a convention for partial views although this is not enforced and does not add any magic functionality - any action can result in a partial response and actions starting with an underscore do not have to be partials and are not necessarily returned as partials.
+
 ### beforeAction / beforeFilter
 `beforeAction()` and `beforeFilter()` are called (in that order) _after_ the cookie and components are added and intialised just prior to dispatching the action method. This is a good spot to initialise any services used by the controller or to call `__authenticate()` in controllers that have security concerns.
 
 ### afterAction / afterFilter
 `afterAction()` and `afterFilter()` are called (in that order) immediately after calling the action method and ensuring that the view (or `actionResult`) is set.
+
+### The SlabInternals controller
+`SlabInternalsController` is a special built-in controller that is used to support error handling. If you happen to create a controller path named `slab_internals` it won't be picked up by the dispatcher as it will short-circuit to the built-in controller.
 
 
 ## Helpers
