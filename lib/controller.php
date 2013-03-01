@@ -33,10 +33,16 @@ class Controller extends Object {
 	// These get called immediately before and after the action is executed.
 	// These can be overridden in the AppController however if they are also overridden
 	// in a normal controller, the first statement _must_ be parent::beforeAction() or parent::afterAction()
+	// This is called in $dispatcher->dispatch() so can be called multiple times. One-off init and
+	// shutdown should be done in the relevant functions.
 	function beforeAction() {}
 	function afterAction() {}
 	function beforeFilter() {}
 	function afterFilter() {}
+
+	// Called only at the start and end of the request lifecycle
+	function init() {}
+	function shutdown() {}
 	
 	// Helper methods
 	function url($u) {

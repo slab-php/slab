@@ -4,7 +4,6 @@ class Dispatcher extends Object {
 	var $componentRefs = array();
 	var $helperRefs = array();
 	var $baseUrl = '';
-	var $inDispatch = false;
 	var $config = null;
 
 	function __construct($config) {
@@ -70,27 +69,6 @@ class Dispatcher extends Object {
 	// return another action like: $this->actionResult = Dispatcher::dispatch('/c/a/p', array('key'=>'value'));
 	//static
 	function dispatch($cap = null, $data = null) {
-		// The first time this is called (by the bootstrapping file like /slab.php), $inDispatch is false.
-		if ($this->inDispatch) {
-			// This is being called within an action (while dispatching), just run the dispatch without
-			// shutting down the components
-			$controller = $this->__innerDispatch($cap, $data);
-			return $controller->actionResult;
-		}
-		
-		$this->inDispatch = true;
-		$controller = $this->__innerDispatch($cap);
-		$this->inDispatch = false;
-		
-		// shutdown components
-		foreach (array_values($this->componentRefs) as $c) {
-			$c->shutdown();
-		}
-		
-		return $controller->actionResult;
-	}
-
-	function __innerDispatch($cap = null, $data = null) {
 		$controllerName = '';
 		$actionName = '';
 		$params = array();
@@ -165,7 +143,16 @@ class Dispatcher extends Object {
 			$c->afterFilter();
 		}
 		
-		return $controller;
+		return $controller->actionResult;
+	}
+
+	function shutdown() {
+		foreach (array_values($this->componentRefs) as $c) {
+			$c->shutdown();
+		}
+	}
+
+	function __innerDispatch($cap = null, $data = null) {
 	}
 		
 	function &loadController($controllerName, $actionName, $params, $data = null) {

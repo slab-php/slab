@@ -12,4 +12,5 @@ $dispatcher = new Dispatcher($config);
 
 $actionResult = $dispatcher->dispatch();
 $actionResult->render();
+$dispatcher->shutdown();
 ?>

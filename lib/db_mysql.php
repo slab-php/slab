@@ -1,13 +1,6 @@
 <?php
-/* DbMySql
-** Database implementation for MySQL databases
-** BJS20090401
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-** Changes:
-*/
 
 class DbMySql extends Database {
-	// Fields:
 	var $connection = null;
 	var $columnTypes = array(
 		'primary_key'	=> array('formatter' => 'intval'),
@@ -24,10 +17,10 @@ class DbMySql extends Database {
 	);
 	
 	function connect() {
-		if ($this->connected)
+		if (!empty($this->connection)) {
 			$this->disconnect();
+		}
 		
-		// connect to the database
 		$host = $this->host;
 		if (isset($this->port)) {
 			$host .= ':'.$this->port;
@@ -39,14 +32,13 @@ class DbMySql extends Database {
 			$this->password,
 			true);
 		
-		// select the database
-		$this->connected = mysql_select_db($this->database, $this->connection);
-		
-		return $this->connected;
+		$connected =  mysql_select_db($this->database, $this->connection);
+		return $connected;
 	}
 	
 	function disconnect() {
-		$this->connected = !@mysql_close($this->connection);
+		@mysql_close($this->connection);
+		$this->connection = null;
 	}
 	
 	// SELECT $fields FROM $table WHERE $conditions GROUP BY $groupBy ORDER BY $orderBy LIMIT $limit
