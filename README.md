@@ -37,7 +37,9 @@ Returns the last error generated in the current database connection.
 `save($data)`: saves the data to the database (in the configured table). If `$data` includes the primary field, performs an `UPDATE` otherwise performs an `INSERT` and returns the ID (the value of `mysql_insert_id()`).
 
 #### updateField
-`updateField($fieldName, $fieldData)`: updates a single field to the model identified by `$this->id`. **This will be deprecated and an `id` field added to the method: `updateField($id, $fieldName, $fieldData)` (#16).
+`updateField($id, $fieldName, $fieldData)`: updates a single field to the model identified by `$id`. Eg:
+
+    $pageModel->updateField(16, 'content', $newContent);
 
 #### remove / del / delete
 `remove($id)`: deletes the row with the given ID.

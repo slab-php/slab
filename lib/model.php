@@ -180,10 +180,9 @@ class Model extends Object {
 	}
 	
 	
-	// update a single field to the model identified by $this->id
-	function updateField($fieldName, $fieldData) {
+	function updateField($id, $fieldName, $fieldData) {
 		return $this->save(array(
-			$this->primaryFieldName => $this->id,
+			$this->primaryFieldName => $id,
 			$fieldName => $fieldData
 		));
 	}
