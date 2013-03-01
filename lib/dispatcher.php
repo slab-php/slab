@@ -258,9 +258,10 @@ class Dispatcher extends Object {
 			throw new Exception('Reserved action names are not permitted');
 		}
 	
-		// if the action starts with an underscore, a private/protected method is being attempted, which is not allowed
-		if (strpos($actionName, '_', 0) === 0) {
-			throw new Exception('Private/protected actions are not permitted - TODO better error handling ;-)');
+		// if the action starts with a double underscore, a protected method is being attempted, which is not allowed
+		// Single underscores are allowed, used as a convention for partials
+		if (strpos($actionName, '__', 0) === 0) {
+			throw new Exception('Protected actions are not permitted');
 		}
 		
 		// make sure the method exists
