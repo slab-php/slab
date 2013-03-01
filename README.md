@@ -10,8 +10,31 @@ Views are PHP files that are included in the `View::__render` method. In the sco
 - `$this` is the `View` instance
 - The `$html` and `$number` helpers
 - `$pageTitle` is available, and can be set within the view, and used when rendering the layout (eg. `<title><?php eh($pageTitle); ?></title>`)
-- `$dispatcher`, the request-wide `Dispatcher` instance which can be used for rendering subviews: `<ul><?php e($dispatcher->dispatch("/item/view/{$id}", array('data' => $data))->renderToString()); ?></ul>`
+- `$dispatcher`, the request-wide `Dispatcher` instance which can be used for rendering partials/subviews: `<ul><?php e($dispatcher->dispatch("/item/view/{$id}", array('data' => $data))->renderToString()); ?></ul>`
 - Anything set in the controller using the `set` method is first class, so if the controller action method uses `$this->set('foos', $this->fooService->getFoos());` the view will be able to do something like `<?php foreach ($foos as $foo): ?>...<?php endforeach; ?>`
+
+### Partials / subviews
+A partial view is broduced by a controller action that returns `$this->partial()`, which is a `PartialView`. Calling `$view->renderToString` then returns a string which can be displayed in the containing view. So I might have an item view partial in `controllers/my_item_controller.php`:
+
+    function item_view($id) {
+    	$this->set('item', $this->itemService->get($id));
+		return $this->partial();
+    }
+
+The partial view itself (`views/my_item/item_view`):
+
+	<li><?php e($item['name']); ?></li>
+
+A main view then uses the partial in a loop:
+
+    <h1>Items:</h1>
+    <ul>
+    	<?php foreach ($items as $item): ?>
+			<?php e($dispatcher->dispatch("/my_item/item_view/{$item['id']}")->renderToString()); ?>
+        <?php endforeach; ?>
+    <ul>
+
+
 
 ## Models
 
