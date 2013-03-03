@@ -55,6 +55,14 @@ The partial is used in another view as follows:
 
 The `Model` class in Slab is a wrapper around a simple database access layer. Generally services receive an instance of the `Model` class which has been initialised with a connection to the database and the name of the underlying table. The database schema is also loaded and used to escape fields. The `Model` class then provides methods that hide some of the complexity of querying the underlying table and provide typed and parameterised `INSERT` and `UPDATE` methods. The database is never too far under the surface though: `$foos = $model->find_all_by_query("SELECT * FROM Foos WHERE name = 'Ben'")` goes straight to the database and returns an array of hash arrays: `$foos[0]['name'] == 'Ben'`.
 
+Note that if you are trying to save UTF-8 text (eg copying and pasting from MS Word which includes so-called 'smart quotes') to a database table which is set up for UTF-8 collation the site needs include this in the `head`:
+
+	<head>
+		<meta charset='utf-8>
+		...
+		
+See [this StackOverflow question](http://stackoverflow.com/questions/4696499/meta-charset-utf-8-vs-meta-http-equiv-content-type) for some discussion around this issue.
+
 ### get_last_error
 Returns the last error generated in the current database connection.
 

@@ -97,7 +97,7 @@ class DbMySql extends Database {
 		$values = implode(', ', $valueArray);
 
 		$sql = "UPDATE {$this->tablePrefix}{$table} SET {$values} WHERE {$where}";
-			
+
 		return $this->query($sql);
 	}
 	
