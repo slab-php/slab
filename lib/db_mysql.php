@@ -20,134 +20,114 @@ class DbMySql extends Database {
 		if (!empty($this->connection)) {
 			$this->disconnect();
 		}
-		
-		$host = $this->host;
-		if (isset($this->port)) {
-			$host .= ':'.$this->port;
-		}
 
-		$this->connection = mysql_connect(
-			$host,
+		$this->port = empty($this->port) ? null : $this->port;
+		
+		$this->connection = new mysqli(
+			$this->host,
 			$this->login,
 			$this->password,
-			true);
-		
-		$connected =  mysql_select_db($this->database, $this->connection);
-		return $connected;
+			$this->database,
+			$this->port);
+
+		return $this->check_connection();
 	}
 	
 	function disconnect() {
-		@mysql_close($this->connection);
+		if (empty($this->connection)) return;
+		$this->connection->close();
 		$this->connection = null;
 	}
+
+	function check_connection() {
+		if (empty($this->connection)) {
+			throw new Exception('Connection to the database has not been established');
+		}
+
+		if (mysqli_connect_error()) {
+			throw new Exception('Database connection error ('.mysqli_connect_errno().') '.mysqli_connect_error());
+		}
+
+		return true;
+	}
 	
-	// SELECT $fields FROM $table WHERE $conditions GROUP BY $groupBy ORDER BY $orderBy LIMIT $limit
-	function select($table, $fields=null, $conditions=null, $orderBy=null, $groupBy=null, $limit=null) {
-		if (empty($fields)) {
-			$fields = '*';
-		}
-			
-		// Form the SQL statement:
-		$sql = 'SELECT ';
-		// fields
-		$sql .= $fields.' ';
-		// FROM
-		$sql .= 'FROM '.$this->tablePrefix.$table.' ';
-		// WHERE
-		if (!empty($conditions)) {
-			$sql .= 'WHERE '.$conditions.' ';
-		}
-		// GROUP BY
-		if (!empty($groupBy)) {
-			$sql .= 'GROUP BY '.$groupBy.' ';
-		}
-		// ORDER BY
-		if (!empty($orderBy)) {
-			$sql .= 'ORDER BY '.$orderBy.' ';
-		}
-		// LIMIT
-		if (!empty($limit)) {
-			$sql .= 'LIMIT '.$limit;
-		}
+	function select($table, $fields = null, $where = null, $orderBy = null, $groupBy = null, $limit = null) {
+		$fields = empty($fields) ? '*' : $fields;
+		$where = empty($where) ? '' : "WHERE {$where}";
+		$orderBy = empty($orderBy) ? '' : "ORDER BY {$orderBy}";
+		$groupBy = empty($groupBy) ? '' : "GROUP BY {$groupBy}";
+		$limit = empty($limit) ? '' : "LIMIT {$limit}";
+
+		$sql = "SELECT {$fields} FROM {$this->tablePrefix}{$table} {$where} ${groupBy} {$orderBy} {$limit}";
 
 		return $this->query($sql);
 	}
 	
 	function query($sql) {
-		// execute the query and load it into $data
-		$result = mysql_query($sql, $this->connection);
+		$this->check_connection();
+
+		$result = $this->connection->query($sql);
+
 		if (!$result) {
-			throw new Exception(mysql_error().': '.h($sql));
+			throw new Exception($this->connection->error.': '.h($sql));
 		}
 		
-		if (!strStartsWith(uc($sql), array('SELECT','SHOW'))) {
-			// not a select operation, just return the result
+		if (!str_starts_with(uc($sql), array('SELECT', 'SHOW'))) {
 			return $result;
 		}
 		
-		// pull out the returned data
 		$data = array();
-		while ($row = mysql_fetch_assoc($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$data[] = $row;
 		}
+
+		$result->free();
 		
 		return $data;
 	}
 	
-	// UPDATE $table SET ($data as x=y) WHERE $conditions
+	// UPDATE $table SET ($data as x=y) WHERE $where
 	// There is an assumption that data is already escaped
-	function update($table, $data, $conditions) {
+	function update($table, $data, $where) {
 		$valueArray = array();
 		foreach ($data as $key=>$value) {
 			$valueArray[] = '`'.$key.'`='.$value;
 		}
+
+		$values = implode(', ', $valueArray);
+
+		$sql = "UPDATE {$this->tablePrefix}{$table} SET {$values} WHERE {$where}";
 			
-		$sql = 'UPDATE '.$this->tablePrefix.$table.' SET '.implode(', ', $valueArray).' WHERE '.$conditions;
-		$result = mysql_query($sql, $this->connection);
-		
-		if (!$result) {
-			throw new Exception(mysql_error().': '.h($sql));
-		}
-		
-		return $result;
+		return $this->query($sql);
 	}
 	
 	// INSERT INTO $table($data keys) VALUES($data values)
 	// return the new id
 	function insert($table, $data) {
-		$sql = 
-			'INSERT INTO '.$this->tablePrefix.$table.'('
-			.'`'.implode('`, `', array_keys($data)).'`'
-			.') VALUES('
-			.implode(', ', array_values($data))
-			.')';
+		$dataKeys = implode('`, `', array_keys($data));
+		$dataValues = implode(', ', array_values($data));
 
-		$result = mysql_query($sql, $this->connection);
-		if (!$result) {
-			throw new Exception(mysql_error().': '.h($sql));
-		}
+		$sql = "INSERT INTO {$this->tablePrefix}{$table}(`{$dataKeys}`) VALUES({$dataValues})";
+
+		$this->query($sql);
 		
-		$this->id = mysql_insert_id($this->connection);
+		$this->id = $this->connection->insert_id();
 		
 		return $this->id;
 	}
 	
 	// DELETE FROM $table WHERE $conditions
 	function delete($table, $conditions = null) {
-		$sql = 'DELETE FROM '.$this->tablePrefix.$table;
-		if (!empty($conditions)) {
-			$sql .= ' WHERE '.$conditions;
-		}
-		$result = mysql_query($sql, $this->connection);
-		if (!$result) {
-			throw new Exception(mysql_error().': '.h($sql));
-		}
-		return $result;
+		$where = empty($conditions) ? '' : "WHERE {$conditions}";
+
+		$sql = "DELETE FROM {$this->tablePrefix}{$table} {$where}";
+
+		return $this->query($sql);
 	}
 	
 	// This is based on CakePHP's DboMySql::value():
 	//   Returns a quoted and escaped string of $data for use in an SQL statement.
- 	function makeValueSafe($data, $column = null) {
+ 	function make_value_safe($data, $column = null) {
 		if (empty($column)) {
 			$column = $this->introspectType($data);
 		}
@@ -183,14 +163,13 @@ class DbMySql extends Database {
 			$data = stripslashes($data);
 		}
 		
-		return "'" . mysql_real_escape_string($data, $this->connection) . "'";
+		return "'" . $this->connection->real_escape_string($data) . "'";
 	}
 
-	function getTableSchema($tableName) {
+	function get_table_schema($tableName) {
 		$schema = array();
 
-		$sql = 'SHOW COLUMNS FROM `'.$tableName.'`';
-		$results = $this->query($sql);
+		$results = $this->query("SHOW COLUMNS FROM `{$tableName}`");
 
 		foreach ($results as $row) {
 			$schema[$row['Field']] = array();
@@ -206,38 +185,48 @@ class DbMySql extends Database {
 				switch ($colType) {
 					case 'varchar':
 					case 'char':
-						$schema[$row['Field']]['type'] = 'string'; break;
+						$schema[$row['Field']]['type'] = 'string';
+						break;
 					case 'text':
 					case 'tinytext':
 					case 'mediumtext':
 					case 'longtext':
-						$schema[$row['Field']]['type'] = 'text'; break;
+						$schema[$row['Field']]['type'] = 'text';
+						break;
 					case 'tinyint':
 					case 'smallint':
 					case 'mediumint':
 					case 'int':
 					case 'bigint':
-						$schema[$row['Field']]['type'] = 'integer'; break;
+						$schema[$row['Field']]['type'] = 'integer';
+						break;
 					case 'float':
 					case 'double':
 					case 'decimal':
-						$schema[$row['Field']]['type'] = 'float'; break;
+						$schema[$row['Field']]['type'] = 'float';
+						break;
 					case 'datetime':
-						$schema[$row['Field']]['type'] = 'datetime'; break;
+						$schema[$row['Field']]['type'] = 'datetime';
+						break;
 					case 'timestamp':
-						$schema[$row['Field']]['type'] = 'timestamp'; break;
+						$schema[$row['Field']]['type'] = 'timestamp';
+						break;
 					case 'date':
-						$schema[$row['Field']]['type'] = 'date'; break;
+						$schema[$row['Field']]['type'] = 'date';
+						break;
 					case 'time':
-						$schema[$row['Field']]['type'] = 'time'; break;
+						$schema[$row['Field']]['type'] = 'time';
+						break;
 					case 'blob':
 					case 'tinyblob':
 					case 'mediumblob':
 					case 'longblob':
-						$schema[$row['Field']]['type'] = 'blob'; break;
+						$schema[$row['Field']]['type'] = 'blob';
+						break;
 					case 'bit':
 					case 'bool':
-						$schema[$row['Field']]['type'] = 'bit'; break;
+						$schema[$row['Field']]['type'] = 'bit';
+						break;
 					// not sure about these ones
 					case 'year':
 					case 'enum':
@@ -256,8 +245,9 @@ class DbMySql extends Database {
 		return $schema;
 	}
 	
-	function getLastError() {
-		return mysql_error($this->connection);
+	function get_last_error() {
+		$this->check_connection();
+		return $this->connection->error;
 	}
 }
 ?>

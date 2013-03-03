@@ -1,8 +1,4 @@
 <?php
-/* RedirectRefreshResult
-** A kind of ActionResult that redirects to the provided url using the Refresh header pragma rather then the Location header
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class RedirectRefreshResult extends ActionResult {
 	var $url = null;
@@ -17,7 +13,7 @@ class RedirectRefreshResult extends ActionResult {
 		header('Refresh: 0; '.$dispatcher->url($this->url));
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		return $this->url;
 	}
 };

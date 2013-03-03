@@ -1,33 +1,16 @@
 <?php
-/* bootstrap.php
-** Loads the various libraries and support files
-** BJS20091001
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
-// Disabling this as the changes I needed to make to get Slab working on PHP4 broke PHP5's strict standards...
-//error_reporting(-1);
-
-// Global helpers and third party libraries:
 require_once(SLAB_LIB.'/global_functions.php');
-// Slab targets PHP4 so to work on PHP5 the DOMXML functions need to be restored. This uses
-// a GPLed library by Alexandre Alapetite (http://alexandre.alapetite.fr/doc-alex/domxml-php4-php5/)
-if (PHP_VERSION >= '5') {
-	require_once(SLAB_LIB.'/third_party/domxml-php4-to-php5.php');
-}
 
 $SLAB_EXECUTION_TIME_START = getMicrotime();
 
 require_once(SLAB_LIB.'/object.php');
-
-// load the Config class, then the initial configuration, then attempt to load the app config over the top
 require_once(SLAB_LIB.'/config.php');
-if (file_exists(SLAB_APP.'/config.php')) {
-	require_once(SLAB_APP.'/config.php');
-} else {
-	e('<p>The application configuration file must be created at <code>'.SLAB_APP.'/config.php</code></p>');
-	die();
+
+if (!file_exists(SLAB_APP.'/config.php')) {
+	throw new Exception('The application configuration file must be created at '.SLAB_APP.'/config.php');
 }
+require_once(SLAB_APP.'/config.php');
 
 // include classes
 require_once(SLAB_LIB.'/inflector.php');
@@ -55,7 +38,7 @@ require_once(SLAB_LIB.'/file_result.php');
 require_once(SLAB_LIB.'/object_result.php');
 require_once(SLAB_LIB.'/controller_result.php');
 
-// attempt to load the app AppController, otherwise fall back on the placeholder
+// attempt to load the app's AppController, otherwise fall back on the placeholder
 if (file_exists(SLAB_APP.'/app_controller.php')) {
 	require_once(SLAB_APP.'/app_controller.php');
 } else {

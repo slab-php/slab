@@ -1,9 +1,4 @@
 <?php
-/* view.php
-** Given view data, a view, and a layout, renders the result
-** BJS20091002
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class View extends Object {
 	var $viewName = null;
@@ -22,11 +17,11 @@ class View extends Object {
 	}
 	
 	
-	function setView($viewName) { $this->viewName = $viewName; }
-	function setLayout($layoutName) { $this->layoutName = $layoutName; }
+	function set_view($viewName) { $this->viewName = $viewName; }
+	function set_layout($layoutName) { $this->layoutName = $layoutName; }
 	
 	function render() {
-		$this->__checkViewAndLayoutFilenames();
+		$this->__check_view_and_layout_filenames();
 		
 		// render the view
 		$output = $this->__render($this->viewFilename);
@@ -40,7 +35,7 @@ class View extends Object {
 		return $output;
 	}
 	
-	function __checkViewAndLayoutFilenames() {
+	function __check_view_and_layout_filenames() {
 		// make sure the view file (and layout file if set) exist
 		if (!isset($this->viewFilename)) {
 			$this->viewFilename = SLAB_APP.'/views/'.$this->viewName.'.php';

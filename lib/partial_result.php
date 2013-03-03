@@ -1,8 +1,4 @@
 <?php
-/* PartialResult
-** A kind of ActionResult that renders the provided View without a blank layout
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class PartialResult extends ActionResult {
 	var $view = null;
@@ -15,7 +11,7 @@ class PartialResult extends ActionResult {
 		e($this->renderToString());
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		$layoutName = $this->view->layoutName;
 		$this->view->layoutName = 'blank';		
 		$result = $this->view->render();		

@@ -1,14 +1,12 @@
 <?php
-/* object.php
-** Base class for all objects in the framework. Inspired by / based on CakePHP.
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
+/* Base class for all objects in the framework. Inspired by / based on CakePHP.
 */
 
 class Object {
 	function __construct() {}
 
 	// Override this for own implementation
-	function toString() {
+	function to_string() {
 		return get_class($this);
 	}
 	
@@ -16,7 +14,7 @@ class Object {
 	//   Calls a method on this object with the given parameters. Provides an OO wrapper
 	//   for call_user_func_array, and improves performance by using straight method calls
 	//   in most cases.
-	function dispatchMethod($method, $params = array()) {
+	function dispatch_method($method, $params = array()) {
 		switch (count($params)) {
 			case 0: return $this->{$method}();
 			case 1: return $this->{$method}($params[0]);

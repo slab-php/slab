@@ -122,6 +122,6 @@ class NumberHelper extends Helper {
 		}
 		return $out;
 	}
-
 }
+
 ?>

@@ -5,18 +5,17 @@ class Model extends Object {
 	var $primaryFieldName = null;
 	var $schema = null;
 	var $database = null;
-	var $id = null;
 
 	function __construct($database, $tableName, $primaryFieldName = 'id') {
 		$this->database = $database;
 		$this->tableName = $tableName;
 		$this->primaryFieldName = $primaryFieldName;
 
-		$this->schema = $this->database->getTableSchema($this->tableName);
+		$this->schema = $this->database->get_table_schema($this->tableName);
 	}	
 
-	function getLastError() {
-		return $this->database->getLastError();
+	function get_last_error() {
+		return $this->database->get_last_error();
 	}
 	
 	function create() {
@@ -31,50 +30,37 @@ class Model extends Object {
 	}
 	
 	// Find a single model (first result) by the id (primary key)
-	function find($id = null, $fields = null) { return $this->load($id, $fields); }
-	function get($id = null, $fields = null) { return $this->load($id, $fields); }
-	function load($id = null, $fields = null) {
-		if (empty($id)) {
-			$id = $this->id;
-		}
-		$this->id = $id;
-		
-		$result = $this->database->select(
-			$this->tableName,
-			$fields,
-			$this->primaryFieldName.'='.$this->escape($id, $this->primaryFieldName)
-			);
-		
-		if (count($result) == 0) return null;
-
-		return $result[0];
+	function find($id, $fields = null) { return $this->load($id, $fields); }
+	function get($id, $fields = null) { return $this->load($id, $fields); }
+	function load($id, $fields = null) {
+		return $this->load_first(array($this->primaryFieldName => $id), $fields);
 	}
 	
-	// find all models matching the conditions
-	function findAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
-	function getAll($conditions=null, $fields=null, $order=null) { return $this->loadAll($conditions, $fields, $order); }
-	function loadAll($conditions=null, $fields=null, $order=null) {
+	function find_all($conditions=null, $fields=null, $order=null) { return $this->load_all($conditions, $fields, $order); }
+	function get_all($conditions=null, $fields=null, $order=null) { return $this->load_all($conditions, $fields, $order); }
+	function load_all($conditions=null, $fields=null, $order=null) {
 		return $this->database->select(
 			$this->tableName,
 			$fields,
-			$conditions,
+			$this->__process_conditions($conditions),
 			$order
 		);
 	}
 	
-	function findAllByQuery($sql) { return $this->database->query($sql); }
-	function getAllByQuery($sql) { return $this->database->query($sql); }
-	function loadAllByQuery($sql) { return $this->database->query($sql); }
+	function find_all_by_query($sql) { return $this->database->query($sql); }
+	function get_all_by_query($sql) { return $this->database->query($sql); }
+	function load_all_by_query($sql) { return $this->database->query($sql); }
 	function query($q) { return $this->database->query($sql); }
 	
 	// find the first model matching the conditions
-	function findFirst($conditions=null, $fields=null, $order=null) { return $this->loadFirst($conditions, $fields, $order); }
-	function getFirst($conditions=null, $fields=null, $order=null) { return $this->loadFirst($conditions, $fields, $order); }
-	function loadFirst($conditions=null, $fields=null, $order=null) {
+	function find_first($conditions=null, $fields=null, $order=null) { return $this->load_first($conditions, $fields, $order); }
+	function get_first($conditions=null, $fields=null, $order=null) { return $this->load_first($conditions, $fields, $order); }
+	function load_first($conditions=null, $fields=null, $order=null) {
+
 		$result = $this->database->select(
 			$this->tableName,
 			$fields,
-			$conditions,
+			$this->__process_conditions($conditions),
 			$order,
 			null,
 			'1');
@@ -85,9 +71,9 @@ class Model extends Object {
 	}
 	
 	// find the first model by the given key and value, or an array of key/values in $key
-	function findBy($key, $val=null) { return $this->loadBy($key, $val); }
-	function getBy($key, $val=null) { return $this->loadBy($key, $val); }
-	function loadBy($key, $val=null) {
+	function find_by($key, $val=null) { return $this->load_by($key, $val); }
+	function get_by($key, $val=null) { return $this->load_by($key, $val); }
+	function load_by($key, $val=null) {
 		$condition = '';
 		
 		if (!is_array($key)) {
@@ -106,10 +92,10 @@ class Model extends Object {
 			}
 		}
 	
-		return $this->loadFirst($condition);
+		return $this->load_first($condition);
 	}
 	
-	function __processConditions($conditions) {
+	function __process_conditions($conditions) {
 		if (empty($conditions) || !is_array($conditions)) {
 			return $conditions;
 		}
@@ -132,17 +118,17 @@ class Model extends Object {
 	}
 	
 	// find all models matching the given key and value, or an array of key/values in $key
-	function findAllBy($key, $val = null, $fields = null, $order = null) { return $this->loadAllBy($key, $val, $fields, $order); }
-	function getAllBy($key, $val = null, $fields = null, $order = null) { return $this->loadAllBy($key, $val, $fields, $order); }
-	function loadAllBy($key, $val = null, $fields = null, $order = null) {
+	function find_all_by($key, $val = null, $fields = null, $order = null) { return $this->load_all_by($key, $val, $fields, $order); }
+	function get_all_by($key, $val = null, $fields = null, $order = null) { return $this->load_all_by($key, $val, $fields, $order); }
+	function load_all_by($key, $val = null, $fields = null, $order = null) {
 		$conditions = '';
 		if (!is_array($key)) {		
 			$conditions = $key . '=' . $this->escape($val, $key);
 		} else {
-			$conditions = $this->__processConditions($key);
+			$conditions = $this->__process_conditions($key);
 		}
 		
-		return $this->loadAll($conditions, $fields, $order);
+		return $this->load_all($conditions, $fields, $order);
 	}
 	
 	
@@ -154,7 +140,6 @@ class Model extends Object {
 		if (!is_array($data)) {
 			throw new Exception('Data to save must be an array');
 		}
-	
 		$data = $this->escape($data);
 		
 		foreach ($data as $k=>$v) {
@@ -165,24 +150,23 @@ class Model extends Object {
 
 		// if the data contains the primary key, this is an update, otherwise this is an insert
 		if (isset($data[$this->primaryFieldName])) {
-			$this->id = $data[$this->primaryFieldName];
+			$id = $data[$this->primaryFieldName];
 			unset($data[$this->primaryFieldName]);
 			$result = $this->database->update(
 				$this->tableName,
 				$data,
-				$this->primaryFieldName.'='.$this->id);
-			$data[$this->primaryFieldName] = $this->id;
+				"{$this->primaryFieldName}={$id}");
+			$data[$this->primaryFieldName] = $id;
 			return $result;
 		} else {
-			$this->id = $this->database->insert(
+			return $this->database->insert(
 				$this->tableName,
 				$data);
-			return $this->id;
 		}
 	}
 	
 	
-	function updateField($id, $fieldName, $fieldData) {
+	function update_field($id, $fieldName, $fieldData) {
 		return $this->save(array(
 			$this->primaryFieldName => $id,
 			$fieldName => $fieldData
@@ -198,41 +182,27 @@ class Model extends Object {
 			$this->primaryFieldName.'='.$this->escape($id, $this->primaryFieldName));
 	}
 	
-	// removeAll(), delAll() and deleteAll() are synonyms, delete the models specified
-	// given conditions (or all models if $conditions is not set)
-	function delAll($conditions = null) { return $this->deleteAll($conditions); }
-	function removeAll($conditions = null) { return $this->deleteAll($conditions); }
-	function deleteAll($conditions = null) {
+	// delete the models specified by given conditions (or all models if $conditions is not set)
+	function del_all($conditions = null) { return $this->delete_all($conditions); }
+	function remove_all($conditions = null) { return $this->delete_all($conditions); }
+	function delete_all($conditions = null) {
 		if (!empty($conditions) && is_array($conditions)) {
-			$conditions = $this->__processConditions($conditions);
+			$conditions = $this->__process_conditions($conditions);
 		}
 		return $this->database->delete($this->tableName, $conditions);
 	}
 	
-	// returns true if the model specified by the given id or if models exist in the
-	// database that satisfy the given conditions, false otherwise
-	function exists($id = null, $conditions = null) {
-		$results = null;
-		
-		if (!empty($conditions)) {
-			$conditions = $this->__processConditions($conditions);
-			$results = $this->loadAll($conditions);
-		}
-		else {
-			if (empty($id)) {
-				$id = $this->id;
-			}
-			$this->id = $id;
-			$results = $this->load($this->escape($id, $this->primaryFieldName));
-		}
+	// returns whether models exist in the database that satisfy the given conditions
+	function exists($conditions) {
+		$conditions = $this->__process_conditions($conditions);
+		$results = $this->loadAll($conditions);
 		
 		return !empty($results);
 	}
 	
-	// returns the number of models that exist in the database that satisfy the
-	// given conditions
+	// returns the number of models that exist in the database that satisfy the given conditions
 	function count($conditions = null) {
-		$conditions = $this->__processConditions($conditions);
+		$conditions = $this->__process_conditions($conditions);
 		$result = $this->database->select(
 			$this->tableName,
 			'COUNT(*) AS row_count',
@@ -245,12 +215,12 @@ class Model extends Object {
 	// database type of the field is used for escaping the data.
 	function escape($data, $fieldName = null) {
 		if (!is_array($data)) {
-			return $this->_escapeField($data, $fieldName);
+			return $this->_escape_field($data, $fieldName);
 		}
 		
 		foreach ($data as $k=>$v) {
 			if (!is_array($v)) {
-				$data[$k] = $this->_escapeField($v, $k);
+				$data[$k] = $this->_escape_field($v, $k);
 			}else {
 				$data[$k] = $this->escape($data[$k]);
 			}
@@ -259,7 +229,7 @@ class Model extends Object {
 		return $data;
 	}	
 	// Some of this could probably be moved into Database
-	function _escapeField($value, $fieldName = null) {
+	function _escape_field($value, $fieldName = null) {
 		if ($value === null) {
 			return 'NULL';
 		}
@@ -288,10 +258,10 @@ class Model extends Object {
 				}
 			}
 			
-			return $this->database->makeValueSafe($value, $schema['type']);
+			return $this->database->make_value_safe($value, $schema['type']);
 		}
 
-		return $this->database->makeValueSafe($value);
+		return $this->database->make_value_safe($value);
 	}
 };
 

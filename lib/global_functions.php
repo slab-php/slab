@@ -1,48 +1,13 @@
 <?php
-/* global_functions.php
-** Defines global support functions
+/*
 ** Some of these are copied from CakePHP's basics.php
-** (CC A-SA) Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-** Changes:
 */
 
-// combined h() and e(), echos the html encoded $s
-function eh($s) {
-	e(h($s));
-}
-
-// Alias for count
-function length($a) {
-	return count($a);
-}
-
-// Aliases for htmlspecialchars
-function h($s) {
-	return htmlspecialchars($s);
-}
-function html($s) {
-	return htmlspecialchars($s);
-}
-
-// Returns the microtime, this is used for execution time checking
-function getMicrotime() {
-	list($usec, $sec) = explode(' ', microtime());
-	return ((float)$usec + (float)$sec);
-}
-
-// Alias for echo()
-function e($s) {
-	echo($s);
-}
-
-// Wrapper for print_r() which also wraps the output in <pre> tags
-function pr($v) {
-	e('<pre>');
-	print_r($v);
-	e('</pre>');
-}
-
-// Alias for strtolower/upper
+function e($s) { echo($s); }
+function h($s) { return htmlspecialchars($s); }
+function html($s) { return htmlspecialchars($s); }
+function eh($s) { e(h($s)); }
+function length($a) { return count($a); }
 function lowercase($s) { return strtolower($s); }
 function uppercase($s) { return strtoupper($s); }
 function toLower($s) { return strtolower($s); }
@@ -51,6 +16,17 @@ function uc($s) { return strtoupper($s); }
 function lc($s) { return strtolower($s); }
 function up($s) { return strtoupper($s); }
 function low($s) { return strtolower($s); }
+
+function getMicrotime() {
+	list($usec, $sec) = explode(' ', microtime());
+	return ((float)$usec + (float)$sec);
+}
+
+function pr($v) {
+	e('<pre>');
+	print_r($v);
+	e('</pre>');
+}
 
 // Returns if a given string $source contains the specified search string $search
 // If $search is an array, returns true if any of the items in $search is contained in $source
@@ -66,12 +42,13 @@ function strContains($source, $search) {
 
 	return strpos($source, $search) !== FALSE;
 }
+
 // returns if a given string $source starts with the specified search string $search
 // If $search is an array, returns true if $source starts with any of the items in $search
-function strStartsWith($source, $search) {
+function str_starts_with($source, $search) {
 	if (is_array($search)) {
 		foreach ($search as $s) {
-			if (strStartsWith($source, $s)) {
+			if (str_starts_with($source, $s)) {
 				return true;
 			}
 		}
@@ -93,6 +70,7 @@ function strStartsWith($source, $search) {
  * @link http://book.cakephp.org/view/701/env
  */
 function env($key) {
+	$key = uc($key);
 	if ($key == 'HTTPS') {
 		if (isset($_SERVER) && !empty($_SERVER)) {
 			return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
@@ -100,18 +78,16 @@ function env($key) {
 		return (strpos(env('SCRIPT_URI'), 'https://') === 0);
 	}
 
-	if ($key == 'SCRIPT_NAME') {
-		if (env('CGI_MODE') && isset($_ENV['SCRIPT_URL'])) {
-			$key = 'SCRIPT_URL';
-		}
+	if ($key == 'SCRIPT_NAME' && env('CGI_MODE') && isset($_ENV['SCRIPT_URL'])) {
+		$key = 'SCRIPT_URL';
 	}
 
 	$val = null;
 	if (isset($_SERVER[$key])) {
 		$val = $_SERVER[$key];
-	} elseif (isset($_ENV[$key])) {
+	} else if (isset($_ENV[$key])) {
 		$val = $_ENV[$key];
-	} elseif (getenv($key) !== false) {
+	} else if (getenv($key) !== false) {
 		$val = getenv($key);
 	}
 
@@ -126,35 +102,36 @@ function env($key) {
 		return $val;
 	}
 
-	switch ($key) {
-		case 'SCRIPT_FILENAME':
-			if (defined('SERVER_IIS') && SERVER_IIS === true) {
-				return str_replace('\\\\', '\\', env('PATH_TRANSLATED'));
-			}
-		break;
-		case 'DOCUMENT_ROOT':
-			$name = env('SCRIPT_NAME');
-			$filename = env('SCRIPT_FILENAME');
-			$offset = 0;
-			if (!strpos($name, '.php')) {
-				$offset = 4;
-			}
-			return substr($filename, 0, strlen($filename) - (strlen($name) + $offset));
-		break;
-		case 'PHP_SELF':
-			return str_replace(env('DOCUMENT_ROOT'), '', env('SCRIPT_FILENAME'));
-		break;
-		case 'CGI_MODE':
-			return (PHP_SAPI === 'cgi');
-		break;
-		case 'HTTP_BASE':
-			$host = env('HTTP_HOST');
-			if (substr_count($host, '.') !== 1) {
-				return preg_replace('/^([^.])*/i', null, env('HTTP_HOST'));
-			}
-		return '.' . $host;
-		break;
+	if ($key === 'SCRIPT_FILENAME' && defined('SERVER_IIS') && SERVER_IIS === true) {
+		return str_replace('\\\\', '\\', env('PATH_TRANSLATED'));
 	}
+
+	if ($key === 'DOCUMENT_ROOT') {
+		$name = env('SCRIPT_NAME');
+		$filename = env('SCRIPT_FILENAME');
+		$offset = 0;
+		if (!strpos($name, '.php')) {
+			$offset = 4;
+		}
+		return substr($filename, 0, strlen($filename) - (strlen($name) + $offset));
+	}
+
+	if ($key == 'PHP_SELF') {
+		return str_replace(env('DOCUMENT_ROOT'), '', env('SCRIPT_FILENAME'));
+	}
+
+	if ($key === 'CGI_MODE') {
+		return (PHP_SAPI === 'cgi');
+	}
+
+	if ($key === 'HTTP_BASE') {
+		$host = env('HTTP_HOST');
+		if (substr_count($host, '.') !== 1) {
+			return preg_replace('/^([^.])*/i', null, env('HTTP_HOST'));
+		}
+		return '.' . $host;
+	}
+
 	return null;
 }
 
@@ -170,16 +147,15 @@ function env($key) {
 * @see http://en.wikipedia.org/wiki/UUID
 * @return string A UUID, made up of 32 hex digits and 4 hyphens.
 */
-function uuidSecure() {
+function uuid_secure() {
 	$pr_bits = null;
 	$fp = @fopen('/dev/urandom','rb');
 	if ($fp !== false) {
 		$pr_bits .= @fread($fp, 16);
 		@fclose($fp);
 	} else {
-		// If /dev/urandom isn't available (eg: in non-unix systems), use mt_rand().
 		$pr_bits = "";
-		for($cnt=0; $cnt < 16; $cnt++){
+		for($cnt=0; $cnt < 16; $cnt++) {
 			$pr_bits .= chr(mt_rand(0, 255));
 		}
 	}
@@ -213,7 +189,7 @@ function uuidSecure() {
 }
 
 
-function getMimeType($ext) {
+function get_mime_type($ext) {
 	global $mimeTypes;
 	
 	$mimeType = 'application/octet-stream';
@@ -226,7 +202,7 @@ function getMimeType($ext) {
 	return $mimeType;
 }
 
-function getMimeTypeFromFilename($filename) {
+function get_mime_type_from_filename($filename) {
 	$mimeType = 'application/octet-stream';
 	if (strpos($filename, '.') !== false) {
 		$parts = explode('.', $filename);
@@ -330,56 +306,6 @@ $mimeTypes = array(
 	'xl'	=>	'application/excel',
 	'eml'	=>	'message/rfc822'
 );
-
-
-// json_encode doesn't exist in < PHP 5.2, so...
-// Adapted from http://au.php.net/manual/en/function.json-encode.php#82904
-// *************************************************************************** This could be dropped as I'm not targeting PHP < 5.2 now
-if (!function_exists('json_encode')) {
-  function json_encode($a = false) {
-    if (is_null($a)) {
-			return 'null';
-		}
-    if ($a === false) {
-			return 'false';
-		}
-    if ($a === true) {
-			return 'true';
-		}
-    if (is_scalar($a)) {
-      if (is_float($a)) {
-        // Always use "." for floats.
-        return floatval(str_replace(",", ".", strval($a)));
-      }
-
-      if (is_string($a)) {
-        static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
-        return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
-      } else {
-        return $a;
-			}
-    }
-    $isList = true;
-    for ($i = 0, reset($a); $i < count($a); $i++, next($a)) {
-      if (key($a) !== $i) {
-        $isList = false;
-        break;
-      }
-    }
-    $result = array();
-    if ($isList) {
-      foreach ($a as $v) {
-				$result[] = json_encode($v);
-			}
-      return '[' . join(',', $result) . ']';
-    } else {
-      foreach ($a as $k => $v) {
-				$result[] = json_encode($k).':'.json_encode($v);
-			}
-      return '{' . join(',', $result) . '}';
-    }
-  }
-}
 
 // Adapted from http://www.php.net/manual/en/function.hexdec.php#99478
 // Method to convert a hex color string to an array of (r,g,b),

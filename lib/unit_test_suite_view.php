@@ -1,9 +1,4 @@
 <?php
-/* UnitTestSuite view
-** A special library view for the unit test suite controller
-** This will just be rendered with the app's default layout
-** (CC-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 $caseCount = 0;
 $casePassCount =0;

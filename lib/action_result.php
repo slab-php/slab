@@ -1,7 +1,7 @@
 <?php
 class ActionResult extends Object {
 	function render() {}
-	function renderToString() { return ''; }
+	function render_to_string() { return ''; }
 };
 
 ?>

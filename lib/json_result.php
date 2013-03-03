@@ -1,8 +1,4 @@
 <?php
-/* JsonResult
-** A kind of ActionResult that renders the provided object as a JSON string
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class JsonResult extends ActionResult {
 	var $obj = null;
@@ -19,7 +15,7 @@ class JsonResult extends ActionResult {
 		e($json);
 	}	
 	
-	function renderToString() {
+	function render_to_string() {
 		$json = json_encode($this->obj);
 		
 		return $json;

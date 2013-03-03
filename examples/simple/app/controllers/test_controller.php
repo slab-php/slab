@@ -26,7 +26,7 @@ class TestController extends AppController {
 	
 	function test_dispatch() {
 		$result = $this->dispatcher->dispatch('/test/hello_world');
-		$this->text('Testing dispatch: <pre>'.h($result->renderToString()).'</pre>');
+		$this->text('Testing dispatch: <pre>'.h($result->render_to_string()).'</pre>');
 	}
 	
 }

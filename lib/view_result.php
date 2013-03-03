@@ -11,7 +11,7 @@ class ViewResult extends ActionResult {
 		e($this->view->render());
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		return $this->view->render();
 	}
 };

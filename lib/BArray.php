@@ -1,8 +1,8 @@
 <?php
 class BArray {
 	var $arr;
-	function getArray() { return $this->arr; }
-	function toArray() { return $this->arr; }
+	function get_array() { return $this->arr; }
+	function to_array() { return $this->arr; }
 	
 	function __construct($arr) {
 		$this->arr = $arr;
@@ -36,7 +36,7 @@ class BArray {
 		return new BArray($mapped);
 	}
 	
-	function selectMany($predicate) { return $this->bind($predicate); }
+	function select_many($predicate) { return $this->bind($predicate); }
 	function bind($predicate) {
 		$b = $this->select($predicate);
 		
@@ -48,19 +48,19 @@ class BArray {
 		return new BArray($flat);
 	}
 	
-	function orderBy($predicate) {
+	function order_by($predicate) {
 		$px = str_replace('@@', '$x', $predicate);
 		$py = str_replace('@@', '$y', $predicate);
 		$orderByMethod = "return substr_compare({$px}, {$py}, 0);";
-		return $this->__orderBy($orderByMethod);
+		return $this->__order_by($orderByMethod);
 	}
-	function orderByDesc($predicate) {
+	function order_by_desc($predicate) {
 		$px = str_replace('@@', '$x', $predicate);
 		$py = str_replace('@@', '$y', $predicate);
 		$orderByMethod = "return substr_compare({$py}, {$px}, 0);";
-		return $this->__orderBy($orderByMethod);
+		return $this->__order_by($orderByMethod);
 	}
-	function __orderBy($orderByMethod) {
+	function __order_by($orderByMethod) {
 		$arr = $this->arr;
 		$this->__quicksort($arr, 0, count($this->arr) - 1, $orderByMethod);
 		

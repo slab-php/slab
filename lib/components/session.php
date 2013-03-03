@@ -26,7 +26,7 @@ class SessionComponent extends Component {
 		$this->sessionFilenamePrefix = $this->config->get('session.filename_prefix');		
 	}
 		
-	function beforeAction() {
+	function before_action() {
 		if ($this->sessionType == 'cookie' || $this->sessionIDType == 'cookie') {
 			if (empty($this->controller->Cookie)) {
 				e('Cookie-based sessions require the Cookie component to be loaded');
@@ -47,7 +47,7 @@ class SessionComponent extends Component {
 			}
 		}
 		
-		$this->clearExpiredSessions();
+		$this->clear_expired_sessions();
 		
 		// Load the session if available
 		$this->inSession = false;
@@ -71,9 +71,9 @@ class SessionComponent extends Component {
 		
 		// get the session
 		if ($this->sessionType == 'file') {
-			$sessionFilename = $this->__getSessionFilename();
+			$sessionFilename = $this->__get_session_filename();
 			if ($this->controller->File->exists($sessionFilename)) {
-				$this->data = $this->controller->File->readObject($sessionFilename);
+				$this->data = $this->controller->File->read_object($sessionFilename);
 				if (empty($this->data)) {
 					$this->data = array();
 				}
@@ -91,7 +91,7 @@ class SessionComponent extends Component {
 		}
 	}
 	
-	function afterAction() {
+	function after_action() {
 		$this->save();
 	}
 	
@@ -121,7 +121,7 @@ class SessionComponent extends Component {
 		$this->remove($name);
 	}
 	
-	function removeAll() {
+	function remove_all() {
 		foreach (array_keys($this->data) as $n) {
 			$this->remove($n);
 		}
@@ -137,7 +137,7 @@ class SessionComponent extends Component {
 			$this->end();
 		}
 		
-		$this->sessionID = uuidSecure();
+		$this->sessionID = uuid_secure();
 		$this->inSession = true;
 		$this->save();
 	}
@@ -162,7 +162,7 @@ class SessionComponent extends Component {
 		$this->inSession = false;
 	}
 
-	// Saves the session. This is called in SessionComponent::afterFilter(), so doesn't need to explicitly called.
+	// Saves the session. This is called in SessionComponent::after_filter(), so doesn't need to explicitly called.
 	function save() {	
 		if (!$this->inSession) {
 			return;
@@ -183,7 +183,7 @@ class SessionComponent extends Component {
 			// save the session data to the database
 		} else if ($this->sessionType == 'file') {
 			// save the session data to a temp file
-			$this->controller->File->writeObject($this->__getSessionFilename(), $this->data);
+			$this->controller->File->write_object($this->__get_session_filename(), $this->data);
 		}
 		
 		// If the session id type is 'url', it gets rendered in the view whenever HtmlHelper::url() is called (actually in Dispatcher::url())
@@ -191,12 +191,12 @@ class SessionComponent extends Component {
 	
 	
 	// Private method for getting the filename used to store file-based session data
-	function __getSessionFilename() {
+	function __get_session_filename() {
 		return SLAB_APP.'/temp/'.$this->sessionFilenamePrefix.base64_encode($this->sessionID).'.txt';
 	}
 	
 	// Clears all sessions that have expired. This is called in beforeFilter(), before any current session is attempted to be loaded.
-	function clearExpiredSessions() {
+	function clear_expired_sessions() {
 		if ($this->sessionType == 'cookie') {
 		} else if ($this->sessionType == 'database') {
 		} else if ($this->sessionType == 'file') {

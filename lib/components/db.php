@@ -2,7 +2,7 @@
 
 class DbComponent extends Component {
 	var $config = null;
-	var $db = null;	// reference to a Database instance
+	var $db = null;
 
 	function __construct($config) {
 		$this->config = $config;
@@ -26,8 +26,8 @@ class DbComponent extends Component {
 			$this->db->tablePrefix = $this->config->get('db.tablePrefix');
 
 			if (!$this->db->connect()) {
-				e('An error occured while connecting to the database: '.$this->getLastError());
-				die();
+				$lastError = $this->get_last_error();
+				throw new Exception("An error occured while connecting to the database: {$lastError}");
 			}
 		}
 	}
@@ -41,7 +41,7 @@ class DbComponent extends Component {
 		return $this->db->query($sql);
 	}
 	
-	function select($table, $fields=null, $conditions=null, $orderBy=null, $groupBy=null, $top=null) {
+	function select($table, $fields = null, $conditions = null, $orderBy = null, $groupBy = null, $top = null) {
 		return $this->db->select($table, $fields, $conditions, $orderBy, $groupBy, $top);
 	}
 	
@@ -57,20 +57,16 @@ class DbComponent extends Component {
 		return $this->db->delete($table, $conditions);
 	}
 	
- 	function makeValueSafe($data, $type = null) {
-		return $this->db->makeValueSafe($data, $type);
+ 	function make_value_safe($data, $type = null) {
+		return $this->db->make_value_safe($data, $type);
 	}
 
-	function introspectType($value) {
-		return $this->db->introspectType($value);
+	function get_table_schema($tableName) {
+		return $this->db->get_table_schema($tableName);
 	}
 	
-	function getTableSchema($tableName) {
-		return $this->db->getTableSchema($tableName);
-	}
-	
-	function getLastError() {
-		return $this->db->getLastError();
+	function get_last_error() {
+		return $this->db->get_last_error();
 	}
 
 }

@@ -7,25 +7,12 @@ class FileComponent extends Component {
 		$this->config = $config;
 	}
 
-	function init() {
-	}
-
-	function beforeAction() {
-	}	
-	
-	function afterAction() {
-	}
-	
-	function shutdown() {
-	}
-	
-	// wrapper for file_exists()
 	function exists($filename) {
 		return file_exists($filename);
 	}
 
-	function loadPostedFile($postedFile) { return $this->readPostedFile($postedFile); }
-	function readPostedFile($postedFile) {
+	function load_posted_file($postedFile) { return $this->read_posted_file($postedFile); }
+	function read_posted_file($postedFile) {
 		if (empty($postedFile)) {
 			throw new Exception('No data provided');
 		}
@@ -60,7 +47,8 @@ class FileComponent extends Component {
 		
 		return $data;
 	}
-	function readText($filename, $mode = 'rb') {
+
+	function read_text($filename, $mode = 'rb') {
 		return $this->read($filename, $mode);
 	}
 	
@@ -76,13 +64,14 @@ class FileComponent extends Component {
 		flock($f, LOCK_UN);
 		fclose($f);
 	}
-	function writeText($filename, $data, $mode = 'wb') {
+
+	function write_text($filename, $data, $mode = 'wb') {
 		$this->write($filename, $data, $mode);
 	}
 	
 	// Writes a serialized object to a file. If the Security component is available, encrypts the serialized object first. Read the object
 	// with FileComponent::readObject()
-	function writeObject($filename, $data, $mode = 'wb', $useEncryption = true) {
+	function write_object($filename, $data, $mode = 'wb', $useEncryption = true) {
 		$data = serialize($data);
 		if ($useEncryption && !empty($this->controller->Security)) {
 			$data = $this->controller->Security->encrypt($data);
@@ -92,7 +81,7 @@ class FileComponent extends Component {
 	
 	// Reads a serialized object from a file. If the Security component is available, decrypts the serialized data before unserializing. Write the object
 	// with FileComponent::writeObject()
-	function readObject($filename, $useEncryption = true) {
+	function read_object($filename, $useEncryption = true) {
 		$data = $this->read($filename);
 		if ($useEncryption && !empty($this->controller->Security)) {
 			$data = $this->controller->Security->decrypt($data);

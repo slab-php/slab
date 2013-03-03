@@ -11,15 +11,15 @@ class AjaxResult extends ActionResult {
 	}
 	
 	function render() {
-		$html =& $this->dispatcher->loadHelper('html');
-		$html->headerStatus($this->statusCode);
-		$html->headerNoCache();
+		$html =& $this->dispatcher->load_helper('html');
+		$html->header_status($this->statusCode);
+		$html->header_no_cache();
 		if (!empty($this->data)) {
 			e($this->data);
 		}
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		return $this->data;
 	}
 };

@@ -25,7 +25,7 @@ class CookieComponent extends Component {
 		$this->useEncryption = $this->config->get('cookie.use_encryption');
 	}
 	
-	function initCookie() {
+	function init_cookie() {
 		// copy and decrypt the current cookie
 		// This function is called by the dispatcher between init()ing and beforeFilter()ing the controllers
 		// as the Session component requires the cookie to be loaded before its beforeFilter() methods executes.
@@ -33,14 +33,8 @@ class CookieComponent extends Component {
 		// Session::beforeFilter() were to execute before Cookie::beforeFilter()
 		$this->data = isset($_COOKIE[$this->cookieName]) ? $_COOKIE[$this->cookieName] : array();
 		if ($this->useEncryption) {
-			$this->__decryptData();
+			$this->__decrypt_data();
 		}
-	}
-		
-	function beforeAction() {
-	}
-	
-	function afterAction() {
 	}
 	
 	// $value is either an array or a string
@@ -121,16 +115,13 @@ class CookieComponent extends Component {
 		}
 	}
 	
-	// Remove all of the cookies
 	function removeAll() {
 		foreach ($this->data as $k=>$v) {
 			$this->remove($k);
 		}
 	}
 	
-	
-	// Private method used by beforeFilter() to recursively decrypt $this->data
-	function __decryptData($arr = null) {
+	function __decrypt_data($arr = null) {
 		$security = new Security($this->config);
 
 		if (empty($arr)) {
@@ -144,7 +135,7 @@ class CookieComponent extends Component {
 			if (!is_array($v)) {
 				$arr[$k] = $security->decrypt($v);
 			} else {
-				$arr[$k] = $this->__decryptData($v);
+				$arr[$k] = $this->__decrypt_data($v);
 			}
 		}
 		

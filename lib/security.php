@@ -44,7 +44,7 @@ class Security extends Object {
 	function encrypt($data) { return $this->encode($data); }
 	function encode($data) {
 		// xor and encode the data and the encryption key
-		$result = $this->__xorEncode($data, $this->__encryptionKey);
+		$result = $this->__xor_encode($data, $this->__encryptionKey);
 
 		// if configured and supported, mcrypt encode the data as well (using Rijndael256)
 		if ($this->config->get('security.use_mcrypt') && $this->__mcryptExists) {
@@ -69,27 +69,27 @@ class Security extends Object {
 			if ($result === false) return false;
 		}
 
-		$result = $this->__xorDecode($result, $this->__encryptionKey);
+		$result = $this->__xor_decode($result, $this->__encryptionKey);
 	
 		return $result;
 	}
 
 	// Encrypt some data using mcrypt
 	// This is based on CodeIgniter's CI_Encrypt::mcrypt_encode()
-	function __mcryptEncode($data, $key) {
+	function __mcrypt_encode($data, $key) {
 		//mcrypt_module_open($_Security__mcryptCipher, '', $_Security__mcryptMode, '');
 		// TODO: mcrypt is giving errors re not warning, I've disabled it for now
 		$initSize = mcrypt_get_iv_size($this->__mcryptCipher, $this->__mcryptMode);
 		$initVect = mcrypt_create_iv($initSize, MCRYPT_RAND);
-		return $this->__addCipherNoise(
+		return $this->__add_cipher_noise(
 			$initVect . mcrypt_encrypt($this->__mcryptCipher, $key, $data, $this->__mcryptMode, $initVect), 
 			$key);
 	}
 	
 	// Decrypt some data using mcrypt
 	// This is based on CodeIgniter's CI_Encrypt::mcrypt_decode()
-	function __mcryptDecode($data, $key) {
-		$data = $this->__removeCipherNoise($data, $key);
+	function __mcrypt_decode($data, $key) {
+		$data = $this->__remove_cipher_noise($data, $key);
 		$initSize = mcrypt_get_iv_size($this->__mcryptCipher, $this->__mcryptMode);
 
 		if ($initSize > strlen($data)) {
@@ -103,7 +103,7 @@ class Security extends Object {
 	
 	
 	// Based on CodeIgniter's CI_Encrypt::_xor_encode()
-	function __xorEncode($data, $key) {
+	function __xor_encode($data, $key) {
 		// Generate a random hash
 		$rand = '';
 		while (strlen($rand) < 32) {
@@ -117,12 +117,12 @@ class Security extends Object {
 			$result .= substr($rand, ($i % strlen($rand)), 1).(substr($rand, ($i % strlen($rand)), 1) ^ substr($data, $i, 1));
 		}
 
-		return $this->__xorMerge($result, $key);
+		return $this->__xor_merge($result, $key);
 	}
 
 	// Based on CodeIgniter's CI_Encrypt::_xor_decode()
-	function __xorDecode($data, $key) {
-		$data = $this->__xorMerge($data, $key);
+	function __xor_decode($data, $key) {
+		$data = $this->__xor_merge($data, $key);
 
 		$result = '';
 		for ($i = 0; $i < strlen($data); $i++) {
@@ -134,7 +134,7 @@ class Security extends Object {
 
 	// Merge a string with a key using XOR
 	// Based on CodeIgniter's CI_Encrypt::_xor_merge()
-	function __xorMerge($data, $key) {
+	function __xor_merge($data, $key) {
 		$hash = $this->hash($key);
 		$result = '';
 		for ($i = 0; $i < strlen($data); $i++) {
@@ -147,7 +147,7 @@ class Security extends Object {
 	// Based on CodeIgniter's CI_Encrypt::_add_cypher_noise():
 	// Adds permuted noise to the IV + encrypted data to protect against Man-in-the-middle attacks on CBC mode ciphers
 	// http://www.ciphersbyritter.com/GLOSSARY.HTM#IV
-	function __addCipherNoise($data, $key) {
+	function __add_cypher_noise($data, $key) {
 		$keyhash = $this->hash($key);
 		$keylen = strlen($keyhash);
 		$str = '';
@@ -165,7 +165,7 @@ class Security extends Object {
 
 	// Based on CodeIgniter's CI_Encrypt::_add_cipher_noise():
 	// Removes permuted noise from the IV + encrypted data, reversing _add_cipher_noise()
-	function __removeCipherNoise($data, $key) {
+	function __remove_cipher_noise($data, $key) {
 		$keyhash = $this->hash($key);
 		$keylen = strlen($keyhash);
 		$str = '';

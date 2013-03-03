@@ -30,21 +30,13 @@ class Controller extends Object {
 		$this->methods = array_diff($childMethods, $parentMethods);
 	}
 	
-	// These get called immediately before and after the action is executed.
-	// These can be overridden in the AppController however if they are also overridden
-	// in a normal controller, the first statement _must_ be parent::beforeAction() or parent::afterAction()
-	// This is called in $dispatcher->dispatch() so can be called multiple times. One-off init and
-	// shutdown should be done in the relevant functions.
-	function beforeAction() {}
-	function afterAction() {}
-	function beforeFilter() {}
-	function afterFilter() {}
-
-	// Called only at the start and end of the request lifecycle
+	function before_action() {}
+	function after_action() {}
+	function before_filter() {}
+	function after_filter() {}
 	function init() {}
 	function shutdown() {}
 	
-	// Helper methods
 	function url($u) {
 		return Dispatcher::url($u);
 	}
@@ -59,91 +51,89 @@ class Controller extends Object {
 		}
 	}
 	
-	// just change the layout:
-	function layout($l) {
-		$this->view->setLayout($l);
+	function set_layout($layout) {
+		$this->view->set_layout($layout);
 	}
 	
-	// These methods are used to generate the result of an action
-	// Eg: to redirect to another action: $this->redirect('/c/a/p');
-	// to render the default view (this is done by default): $this->render();
-	// to render a given view: $this->view('/controller/view')
-	// to render a given view and layout: $this->view('/controller/view', 'another_layout');
-	// to render a view to a blank layout (partial view): $this->renderPartial();
-	// to return some JSON: $this->json($model);
-	// to return plain text: $this->text('a string');
-	// to write a buffer as an inline file: $this->file($filename, $data); (or fileInline())
-	// to write a file as an attachment: $this->fileAttachment($filename, $data);
-	// to write a 200 OK response: $this->ajaxSuccess()
-	// or a 500 internal error: $this->ajaxFailure()
-	// or a 404 file not found: $this->fileNotFound()
-	
-	function view($view = null, $layout = null) {
+	function set_view($view = null, $layout = null) {
 		if (isset($view)) {
-			$this->view->setView($view);
+			$this->view->set_view($view);
 		}
 		if (isset($layout)) {
 			$this->view->setLayout($layout);
 		}
 		$this->actionResult = new ViewResult($this->view);
-	}	
+	}
+
 	function partial($view = null) {
 		if (isset($view)) $this->view->setView($view);
 		$this->actionResult = new PartialResult($this->view);
 	}
-	function redirect($u) {
-		$this->actionResult = new RedirectResult($u);
+
+	function redirect($url) {
+		$this->actionResult = new RedirectResult($url);
 	}
-	function redirectRefresh($u) {
+
+	function redirect_refresh($u) {
 		$this->actionResult = new RedirectRefreshResult($u);
 	}
+
 	function text($s) {
 		$this->actionResult = new TextResult($s);
 	}	
+
 	function json($o) {
 		$this->actionResult = new JsonResult($o);
 	}
-	// file() is a synonym for fileInline()
-	function file($filename, $data, $encoding='binary') { $this->fileInline($filename, $data, $encoding); }	
-	function fileInline($filename, $data, $encoding='binary') {
+
+	// file() is a synonym for file_inline()
+	function file($filename, $data, $encoding='binary') { $this->file_inline($filename, $data, $encoding); }	
+	
+	function file_inline($filename, $data, $encoding='binary') {
 		$this->actionResult = new FileResult($filename, $data, $encoding, 'inline');
 	}
-	function fileAttachment($filename, $data, $encoding='binary') {
+
+	function file_attachment($filename, $data, $encoding='binary') {
 		$this->actionResult = new FileResult($filename, $data, $encoding, 'attachment');
 	}
+
 	function ajax($statusCode, $data = null) {
 		$this->actionResult = new AjaxResult($statusCode, $data, $this->dispatcher);
 	}
-	function ajaxSuccess($data = null) {
+
+	function ajax_success($data = null) {
 		$this->actionResult = new AjaxResult(200, $data, $this->dispatcher);
 	}
-	function ajaxFailure($data = null) {
+
+	function ajax_error($data = null) { $this->ajax_failure($data); }
+
+	function ajax_failure($data = null) {
 		$this->actionResult = new AjaxResult(500, $data, $this->dispatcher);
 	}
-	function ajaxError($data = null) {
-		$this->ajaxFailure($data);
-	}
-	function fileNotFound() {
+
+	function file_note_found() {
 		$this->actionResult = new AjaxResult(404, null, $this->dispatcher);
 	}
+
 	// excute another action and use the result of that action for this action (nested dispatch)
 	function action($cap, $data = null) {
 		$this->actionResult = $this->dispatcher->dispatch($cap, $data);
 	}
-	function objectResult($obj) {
+
+	function object_result($obj) {
 		$this->actionResult = new ObjectResult($obj);
 	}
-	function controllerResult($controller) {
+	function controller_result($controller) {
 		$this->actionResult = new ControllerResult($controller);
 	}
-	function physicalFile($filename) {
+	function physical_file($filename) {
 		return $this->fileInline($filename, $this->file->read($filename));
 	}
 	
 	// This should only be used outside of a controller action as it is a dirty way of redirecting.
 	// It dies after setting the header so cookies won't be saved etc
 	// Preferred method is to "return redirect('url')" inside the action.
-	function redirectImmediate($u) {
+	function redirect_immediate($u) {
 		header('Status: 200');
 		header('Location: '.$this->dispatcher->url($u));
 		die();

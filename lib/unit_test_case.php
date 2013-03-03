@@ -1,10 +1,4 @@
 <?php
-/* unit_test_case.php
-** Base class for a unit test case. I'm going to assume testing is done on PHP5, this should work on PHP4 however the
-** test names will be mangled.
-** Well PHP4 doesn't actually support try..catch so screw it
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 // Set up a function to convert errors into exceptions. This is only hooked in when
 // UnitTestCase::runTests() is run (ie when testing) (http://au.php.net/manual/en/class.errorexception.php)
@@ -34,7 +28,7 @@ class UnitTestCase extends Controller {
 	function setup() {}
 	function teardown() {}
 
-	function runTests() {
+	function run_tests() {
 		set_error_handler('unitTestCase_exceptionErrorHandler');
 		
 		$this->results = array();
@@ -61,20 +55,20 @@ class UnitTestCase extends Controller {
 	}
 	
 	function assert($b, $moreInfo = null) { 
-		$this->assertTrue($b, $moreInfo); 
+		$this->assert_true($b, $moreInfo); 
 	}
-	function assertTrue($b, $moreInfo = null) {
+	function assert_true($b, $moreInfo = null) {
 		if ($b !== true) {
-			$this->results[$this->currentTestName] .= 'Call to assertTrue() failed';
+			$this->results[$this->currentTestName] .= 'Call to assert_true() failed';
 			if (isset($moreInfo)) {
 				$this->results[$this->currentTestName] .= ': '.$moreInfo;
 			}
 			$this->results[$this->currentTestName] .= '<br />';
 		}
 	}
-	function assertFalse($b, $moreInfo = null) {
+	function assert_false($b, $moreInfo = null) {
 		if ($b !== false) {
-			$this->results[$this->currentTestName] .= 'Call to assertFalse() failed';
+			$this->results[$this->currentTestName] .= 'Call to assert_false() failed';
 			if (isset($moreInfo)) {
 				$this->results[$this->currentTestName] .= ': '.$moreInfo;
 			}

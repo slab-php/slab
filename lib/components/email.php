@@ -32,8 +32,8 @@ class EmailComponent extends Component {
 		if (!isset($from)) $from = $to;
 		if (!isset($attachments)) $attachments = array();
 
-		if (!$this->__checkForEmailHeaderInjection($content)) throw new Exception('Content contains an illegal email header');
-		if (!$this->__checkReferer()) throw new Exception('Referer is invalid');
+		if (!$this->__check_header_injection($content)) throw new Exception('Content contains an illegal email header');
+		if (!$this->__check_referer()) throw new Exception('Referer is invalid');
 		
 		$boundary = md5(uniqid(time()));
 		
@@ -74,11 +74,11 @@ class EmailComponent extends Component {
 	
 	// check content for email header injection. The regex is copied from the intarwebz (http://snipplr.com/view/28723/check-for-email-header-injection/)
 	// cause I'm lazy.
-	function __checkForEmailHeaderInjection($content) {
+	function __check_header_injection($content) {
 		return !preg_match('/\b^to+(?=:)\b|^content-type:|^cc:|^bcc:|^from:|^subject:|^mime-version:|^content-transfer-encoding:/im', $content);
 	}
 	// check referrer (to deny cross-site posts)
-	function __checkReferer() {
+	function __check_referer() {
 		return !empty($_SERVER['HTTP_REFERER']) || !strContains($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']);
 	}
 }

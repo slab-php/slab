@@ -26,7 +26,7 @@ class HtmlHelper extends Helper {
 		return $r;
 	}	
 	
-	function inputHidden($params) {
+	function input_hidden($params) {
 		$params = array_merge(array(
 			'name' => '',
 			'id' => '',
@@ -36,24 +36,28 @@ class HtmlHelper extends Helper {
 		
 		return "<input type='hidden' name='{$name}' id='{$id}' value='{$value}' />";
 	}
-	function inputText($params) {
+	
+	function input_text($params) {
 		$params = array_merge(array(
 			'type' => 'text'
 		), $params);
 		return $this->input($params);
 	}
-	function inputUrl($params) {
+	
+	function input_url($params) {
 		$params = array_merge(array(
 			'type' => 'url'
 		), $params);
 		return $this->input($params);
 	}
-	function inputFile($params) {
+	
+	function input_file($params) {
 		$params = array_merge(array(
 			'type' => 'file'
 		), $params);
 		return $this->input($params);
 	}
+
 	function input($params) {
 		$params = array_merge(array(
 			'name' => '',
@@ -120,10 +124,10 @@ class HtmlHelper extends Helper {
 			$s .= ">{$v}</option>";
 		}
 		
-		return $this->__selectWrapper($name, $id, $s);;
+		return $this->__select_wrapper($name, $id, $s);;
 	}
 	
-	function selectIntFromRange($name, $id, $from, $to, $current) {
+	function select_int_from_range($name, $id, $from, $to, $current) {
 		$s = '';
 		
 		for ($i = $from; $i < $to + 1; $i ++) {
@@ -132,20 +136,19 @@ class HtmlHelper extends Helper {
 			$s .= ">{$i}</option>";
 		}
 		
-		return $this->__selectWrapper($name, $id, $s);
+		return $this->__select_wrapper($name, $id, $s);
 	}
 	
-	function __selectWrapper($name, $id, $options) {
+	function __select_wrapper($name, $id, $options) {
 		return "<select name=\"{$name}\" id=\"{$id}\">{$options}</select>";
 	}
-
 
 	function url($u) {
 		return $this->dispatcher->url($u);
 	}	
 	
 	// This is adapted from CodeIgniter
-	function headerStatus($code, $reason = null) {
+	function header_status($code, $reason = null) {
 		// check the code
 		if ($code == '' || !is_numeric($code)) {
 			throw new Exception("Status codes must be numeric - ({$code}) is invalid");
@@ -174,7 +177,7 @@ class HtmlHelper extends Helper {
 	}
 
 	// Write the headers to trigger no-cache for IE (used by some AJAX-y View subclasses)
-	function headerNoCache() {
+	function header_no_cache() {
 		header('Cache-Control: no-cache');
 		header('Pragma: no-cache');
 		header('Expires: 0');

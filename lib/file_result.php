@@ -30,7 +30,7 @@ class FileResult extends ActionResult {
 		e($this->data);
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		return $this->data;
 	}
 };

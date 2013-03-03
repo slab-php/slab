@@ -1,10 +1,8 @@
 <?php
 
 class Component extends Object {
-	// The name of the component, eg 'SecurityComponent'
 	var $name = null;
 	
-	// reference to the controller
 	var $controller = null;
 
 	
@@ -16,10 +14,10 @@ class Component extends Object {
 	
 	// These get called immediately before and after the action is executed.
 	// When beforeAction() is called, all other components should be initialised and usable
-	function beforeAction() {}
-	function beforeFilter() {}
-	function afterAction() {}
-	function afterFilter() {}
+	function before_action() {}
+	function before_filter() {}
+	function after_action() {}
+	function after_filter() {}
 
 	// This gets called after afterAction and afterFilter
 	function shutdown() {}

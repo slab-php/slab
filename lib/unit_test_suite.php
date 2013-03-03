@@ -1,13 +1,9 @@
 <?php
-/* unit_test_suite.php
-** Base class for a suite of unit test cases
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class UnitTestSuite extends Controller {
 	var $__testCases = array();
 	
-	function addTest($test) {
+	function add_test($test) {
 		// the test should be in SLAB_APP/tests/$test_test_case.php
 		$filename = SLAB_APP.'/tests/'.$test.'_test_case.php';
 		if (!file_exists($filename)) {
@@ -27,7 +23,7 @@ class UnitTestSuite extends Controller {
 		$this->__testCases[$test] =& $testCase;
 	}
 	
-	function runTestCases() {
+	function run_test_cases() {
 		$this->view->viewFilename = SLAB_LIB.'/unit_test_suite_view.php';
 	
 		$testCases = array();
@@ -62,7 +58,7 @@ class UnitTestSuite extends Controller {
 	}
 	
 	function index() {
-		$this->runTestCases();
+		$this->run_test_cases();
 	}
 };
 

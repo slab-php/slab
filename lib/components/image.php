@@ -2,12 +2,12 @@
 
 /*
 Example:
-$this->Image = Dispatcher::loadComponent('image');
-$img = $this->Image->getPostedImage($this->data['Foo']['photo']);
-$thumbnail = $this->Image->resizeImage($img, THUMBNAIL_X, THUMBNAIL_Y);
-$popup = $this->Image->resizeImage($img, POPUP_X, POPUP_Y);
-$this->data['Foo']['thumbnail'] = $this->Image->saveImageToInMemoryJpeg($thumbnail);
-$this->data['Foo']['popup'] = $this->Image->saveImageToInMemoryJpeg($popup);
+$this->Image = Dispatcher::load_component('image');
+$img = $this->Image->get_posted_image($this->data['Foo']['photo']);
+$thumbnail = $this->Image->resize_image($img, THUMBNAIL_X, THUMBNAIL_Y);
+$popup = $this->Image->resize_image($img, POPUP_X, POPUP_Y);
+$this->data['Foo']['thumbnail'] = $this->Image->save_image_to_in_memory_jpeg($thumbnail);
+$this->data['Foo']['popup'] = $this->Image->save_image_to_in_memory_jpeg($popup);
 unset($this->data['Foo']['photo']);
 */
 
@@ -23,12 +23,12 @@ class ImageComponent extends Component {
 	}
 
 	// assuming JPEGs
-	function loadImageFromFile($filename) {
+	function load image from file($filename) {
 		return imagecreatefromjpeg($filename);
 	}
 
 	// Loads the data for a POSTed image into memory. $img is the uploaded file data, eg $_POST['image']
-	function getPostedImage($postImg) {
+	function get_posted_image($postImg) {
 		if (empty($postImg)) {
 			throw new Exception('No data provided');
 		}
@@ -46,8 +46,8 @@ class ImageComponent extends Component {
 		return imagecreatefromjpeg($postImg['tmp_name']);
 	}
 	
-	// returns a resized image, using the source image (a resource, returned by getPostedImage() for example)
-	function resizeImage($source, $maxWidth, $maxHeight) {
+	// returns a resized image, using the source image (a resource, returned by get_posted_image() for example)
+	function resize_image($source, $maxWidth, $maxHeight) {
 		$width = imagesx($source);
 		$height = imagesy($source);
 		
@@ -73,7 +73,7 @@ class ImageComponent extends Component {
 		return $dest;
 	}
 	
-	function resizeImageHorizontal($source, $newWidth) {
+	function resize_image_horizontal($source, $newWidth) {
 		$width = imagesx($source);
 		$height = imagesy($source);
 		
@@ -85,7 +85,7 @@ class ImageComponent extends Component {
 		return $dest;
 	}
 	
-	function resizeWithBackground($source, $width, $height, $hexRGB) {
+	function resize_with_background($source, $width, $height, $hexRGB) {
 		list($r, $g, $b) = hex2rgb($hexRGB);
 	
 		$srcWidth = imagesx($source);
@@ -130,7 +130,7 @@ class ImageComponent extends Component {
 		return $dest;
 	}
 	
-	function saveImageToInMemoryJpeg($img) {
+	function save_image_to_in_memory_jpeg($img) {
 		ob_start();
 		imagejpeg($img);
 		$jpeg = ob_get_contents();

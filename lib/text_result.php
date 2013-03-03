@@ -1,8 +1,4 @@
 <?php
-/* TextResult
-** A kind of ActionResult that just renders the provided string
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class TextResult extends ActionResult {
 	var $s = null;
@@ -15,7 +11,7 @@ class TextResult extends ActionResult {
 		e($this->s);
 	}
 	
-	function renderToString() {
+	function render_to_string() {
 		return $this->s;
 	}
 };

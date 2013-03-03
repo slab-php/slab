@@ -9,7 +9,7 @@ class Dispatcher extends Object {
 		$this->config = $config;
 	}
 
-	function getFilename($filename) {
+	function get_filename($filename) {
 		return dirname(SLAB_ROOT).$filename;
 	}
 
@@ -53,31 +53,31 @@ class Dispatcher extends Object {
 		return $newUrl;
 	}
 	
-	// url() returns a URL relative to /, absoluteUrl() includes the scheme and host name (like 'http://www.example.com/c/a/p')
-	function absoluteUrl($cap) {
+	// url() returns a URL relative to / but absolute_url() includes the scheme and host name (like 'http://www.example.com/c/a/p')
+	function absolute_url($cap) {
 		return 'http://'.env('HTTP_HOST').$this->url($cap);
 	}
 	
 	// Parses the given /c/a/p triad, finds loads and executes the appropriate controller, and returns the result of rendering the view
 	// This has an optional $data param, this is an assoc array that is merged into the controller's data. This lets an action dispatch and
-	// return another action like: $this->actionResult = Dispatcher::dispatch('/c/a/p', array('key'=>'value'));
+	// return another action like: $this->actionResult = $this->dispatcher->dispatch('/c/a/p', array('key'=>'value'));
 	function dispatch($cap = null, $data = null) {
-		$controller = $this->__innerDispatch($cap, $data);
+		$controller = $this->__inner_dispatch($cap, $data);
 		
 		if (empty($controller->actionResult)) {
-			$controller->view();
+			$controller->set_view();
 		}
 
 		return $controller->actionResult;
 	}
 
 	function partial($cap = null, $data = null) {
-		$controller = $this->__innerDispatch($cap, $data);
+		$controller = $this->__inner_dispatch($cap, $data);
 		$controller->partial();
-		return $controller->actionResult->renderToString();
+		return $controller->actionResult->render_to_string();
 	}
 
-	function __innerDispatch($cap, $data) {
+	function __inner_dispatch($cap, $data) {
 		$controllerName = '';
 		$actionName = '';
 		$params = array();
@@ -113,37 +113,37 @@ class Dispatcher extends Object {
 		}
 
 		// Load and create an instance of the controller
-		$controller =& $this->loadController($controllerName, $actionName, $params, $data);
+		$controller =& $this->load_controller($controllerName, $actionName, $params, $data);
 		if (!is_object($controller)) {
 			throw new Exception('Error loading controller');
 		}
 
-		// if the Cookie component is loaded, call initCookie() (as the cookie must be initialised before 
-		// Session::beforeAction() is called below)
+		// if the Cookie component is loaded, call init_cookie() (as the cookie must be initialised before 
+		// Session::before_action() is called below)
 		if (isset($controller->Cookie)) {
-			$controller->Cookie->initCookie();
+			$controller->Cookie->init_cookie();
 		}
 				
-		// call the components beforeAction and befireFilter
+		// call the components before_action and before_filter
 		foreach (array_keys($controller->componentRefs) as $k) {
-			$controller->componentRefs[$k]->beforeAction();
-			$controller->componentRefs[$k]->beforeFilter();
+			$controller->componentRefs[$k]->before_action();
+			$controller->componentRefs[$k]->before_filter();
 		}
 
 		try {
-			$controller->beforeAction();
-			$controller->beforeFilter();
-			$controller->dispatchMethod($actionName, $params);
-			$controller->afterAction();
-			$controller->afterFilter();
+			$controller->before_action();
+			$controller->before_filter();
+			$controller->dispatch_method($actionName, $params);
+			$controller->after_action();
+			$controller->after_filter();
 		} catch (Exception $ex) {
-			$controller->ajaxError($ex->getMessage());
+			$controller->ajax_error($ex->getMessage());
 		}
 		
-		// call the components afterAction and afterFilter
+		// call the components after_action and after_filter
 		foreach (array_values($controller->componentRefs) as $c) {
-			$c->afterAction();
-			$c->afterFilter();
+			$c->after_action();
+			$c->after_filter();
 		}
 
 		return $controller;
@@ -155,7 +155,7 @@ class Dispatcher extends Object {
 		}
 	}
 
-	function &loadController($controllerName, $actionName, $params, $data = null) {
+	function &load_controller($controllerName, $actionName, $params, $data = null) {
 		$inflector = new Inflector();
 
 		$className = $inflector->camelize($controllerName).'Controller';
@@ -178,7 +178,7 @@ class Dispatcher extends Object {
 		}
 		
 		$controller = new $className($this);
-		$this->__checkAction($controller, $actionName);
+		$this->__check_action($controller, $actionName);
 		
 		$controller->actionName = $actionName;
 		$controller->params = $params;
@@ -221,7 +221,7 @@ class Dispatcher extends Object {
 
 		// load and configure components
 		foreach ($this->config->get('app.default_components') as $componentName) {
-			$component =& $this->loadComponent($componentName);
+			$component =& $this->load_component($componentName);
 			$component->controller =& $controller;
 			$controller->componentRefs[$componentName] =& $component;
 			// add as both $controller->ComponentName and $controller->componentName
@@ -235,7 +235,7 @@ class Dispatcher extends Object {
 		$controller->view->viewName = $controllerName.'/'.$actionName;
 		// load helpers into view
 		foreach ($this->config->get('app.default_helpers') as $helperName) {
-			$helper =& $this->loadHelper($helperName);
+			$helper =& $this->load_helper($helperName);
 			// add (as HelperName and helperName) to both the view's helperRefs array and the controller
 			$helperName = $inflector->camelize($helperName);
 			$controller->$helperName =& $helper;
@@ -248,7 +248,7 @@ class Dispatcher extends Object {
 		return $controller;
 	}
 
-	function __checkAction(&$controller, $actionName) {
+	function __check_action(&$controller, $actionName) {
 		if ($actionName == 'beforeAction' || $actionName == 'afterAction' || $actionName == 'url' ||
 			$actionName == 'render' || $actionName == 'renderPartial' || $actionName == 'redirect' ||
 			$actionName == 'set' || $actionName == 'text' || $actionName == 'json' ||
@@ -272,7 +272,7 @@ class Dispatcher extends Object {
 		}
 	}
 	
-	function &loadComponent($componentName) {
+	function &load_component($componentName) {
 		if (!empty($this->componentRefs[$componentName])) {
 			return $this->componentRefs[$componentName];
 		}
@@ -297,7 +297,7 @@ class Dispatcher extends Object {
 		return $component;
 	}
 	
-	function &loadHelper($helperName) {
+	function &load_helper($helperName) {
 		if (!empty($this->helperRefs[$helperName])) {
 			return $this->helperRefs[$helperName];
 		}
@@ -321,14 +321,14 @@ class Dispatcher extends Object {
 		return $helper;
 	}
 
-	function &loadModel($tableName, $primaryFieldName = 'id') {
-		$db = $this->loadComponent('db');
+	function &load_model($tableName, $primaryFieldName = 'id') {
+		$db = $this->load_component('db');
 		$model = new Model($db, $tableName, $primaryFieldName);
 
 		return $model;
 	}
 
-	function handleException($ex) {
+	function handle_exception($ex) {
 		e($this->partial('/slab_internals/show_exception', array('ex' => $ex)));
 		die();
 	}
