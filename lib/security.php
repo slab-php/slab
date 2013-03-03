@@ -77,7 +77,7 @@ class Security extends Object {
 	// Encrypt some data using mcrypt
 	// This is based on CodeIgniter's CI_Encrypt::mcrypt_encode()
 	function __mcrypt_encode($data, $key) {
-		//mcrypt_module_open($_Security__mcryptCipher, '', $_Security__mcryptMode, '');
+		mcrypt_module_open($this->__mcryptCipher, '', $this->__mcryptMode, '');
 		// TODO: mcrypt is giving errors re not warning, I've disabled it for now
 		$initSize = mcrypt_get_iv_size($this->__mcryptCipher, $this->__mcryptMode);
 		$initVect = mcrypt_create_iv($initSize, MCRYPT_RAND);

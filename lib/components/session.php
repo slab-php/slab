@@ -154,7 +154,7 @@ class SessionComponent extends Component {
 			// TODO delete the session data from the database
 		} else if ($this->sessionType == 'file') {
 			// delete the temp file containing the session data
-			$this->controller->File->remove($this->__getSessionFilename());
+			$this->controller->File->remove($this->__get_session_filename());
 		}
 		
 		$this->data = array();
