@@ -249,11 +249,10 @@ class Dispatcher extends Object {
 	}
 
 	function __check_action(&$controller, $actionName) {
-		if ($actionName == 'beforeAction' || $actionName == 'afterAction' || $actionName == 'url' ||
-			$actionName == 'render' || $actionName == 'renderPartial' || $actionName == 'redirect' ||
-			$actionName == 'set' || $actionName == 'text' || $actionName == 'json' ||
-			$actionName == 'renderFileInline' || $actionName == 'renderFileAttachment' || $actionName == 'renderFile' ||
-			$actionName == 'ajaxSuccess' || $actionName == 'ajaxFailure'
+		if (
+			$actionName == 'before_action' || $actionName == 'after_action' || 
+			$actionName == 'before_filter' || $actionName == 'after_filter' || 
+			$actionName == 'url'
 			) {
 			throw new Exception('Reserved action names are not permitted');
 		}
