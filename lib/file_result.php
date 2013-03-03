@@ -1,9 +1,4 @@
 <?php
-/* FileResult
-** A kind of ActionResult that renders the provided file (actually a filename and data, since
-** most of the time the data will be coming from the database)
-** (CC A-SA) 2009 Belfry Images [http://www.belfryimages.com.au | ben@belfryimages.com.au]
-*/
 
 class FileResult extends ActionResult {
 	var $filename;
@@ -19,7 +14,7 @@ class FileResult extends ActionResult {
 	}
 	
 	function render() {
-		$mimeType = getMimeTypeFromFilename($this->filename);
+		$mimeType = get_mime_type_from_filename($this->filename);
 
 		// Generate the headers
 		header('Content-Type: '.$mimeType);

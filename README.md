@@ -340,6 +340,51 @@ Components are available in each controller's class-wide scope, so within a cont
 ### Image
 ### Session
 
+
+## Examples
+
+### Bootstrap Breadcrumbs
+[Twitter Bootstrap](http://twitter.github.com/bootstrap/) includes a [breadcumb component](http://twitter.github.com/bootstrap/components.html#breadcrumbs). Slab partials can be used to create reusable breadcrumbs. Start with a `_breadcrumbs` view in a `SharedController` - `controllers/shared_controller.php`:
+
+	class SharedController extends AppController {
+		function _breadcrumbs() {
+			$this->set('crumbs', $this->data['crumbs']);
+		}
+	}
+
+This action receives crumbs via the action data which will be shown later. The `views/shared/_breadcrumbs.php` view generates the markup for the breadcrumbs:
+
+	<div class="row-fluid">
+		<ul class="breadcrumb">
+			<?php foreach ($crumbs as $description => $url): ?>
+				<li <?php if (empty($url)): ?>class="current"<?php endif; ?> >
+					<?php if (empty($url)): ?>
+						<?php eh($description); ?>
+					<?php else: ?>
+						<a href="<?php e($url); ?>"><?php eh($description); ?></a>
+						<span class="divider">/</span>
+					<?php endif; ?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+
+This loops through `$crumbs` which is an associative array where the key is the description for the crumb and the value is the url. If the url is null the crumb is treated as the top.
+
+Views include the breadcrumbs at the top. This would be a widget view (`/widgets/view/15` for example):
+
+	<?php e($dispatcher->partial('/shared/_breadcrumbs', array(
+		'Home' => $html->url('/'),
+		'Widgets' => $html->url('/widgets'),
+		"Viewing widget <em>{$widget['name']}</em>" => null
+	))); ?>
+
+This would result in something like:
+
+[Home](#) / [Widgets](#) / Viewing widget _sprocket_
+
+
+
 ## License
 
 Licensed under the Attribution-ShareAlike 3.0 Generic ([CC BY-SA 3.0][ccsa]) license.
@@ -347,16 +392,17 @@ Licensed under the Attribution-ShareAlike 3.0 Generic ([CC BY-SA 3.0][ccsa]) lic
 ### Third-party licenses
 
 #### [PHP Markdown & Extra][markdown_extra]
-
-Copyright (c) 2004-2009 Michel Fortin
-
+Copyright (c) 2004-2009 Michel Fortin  
 All rights reserved.
 
 #### [Original Markdown][original_markdown]
-
-Copyright (c) 2004-2006 John Gruber
-
+Copyright (c) 2004-2006 John Gruber  
 All rights reserved.
+
+#### [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
+Copyright 2012 Twitter, Inc  
+Licensed under the Apache License v2.0  
+<http://www.apache.org/licenses/LICENSE-2.0>
 
 #### Other third-party licenses
 

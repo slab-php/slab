@@ -86,9 +86,6 @@ class Controller extends Object {
 		$this->actionResult = new JsonResult($o);
 	}
 
-	// file() is a synonym for file_inline()
-	function file($filename, $data, $encoding='binary') { $this->file_inline($filename, $data, $encoding); }	
-	
 	function file_inline($filename, $data, $encoding='binary') {
 		$this->actionResult = new FileResult($filename, $data, $encoding, 'inline');
 	}
@@ -127,7 +124,7 @@ class Controller extends Object {
 		$this->actionResult = new ControllerResult($controller);
 	}
 	function physical_file($filename) {
-		return $this->fileInline($filename, $this->file->read($filename));
+		return $this->file_inline($filename, $this->file->read($filename));
 	}
 	
 	// This should only be used outside of a controller action as it is a dirty way of redirecting.

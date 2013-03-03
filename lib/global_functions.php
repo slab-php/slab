@@ -207,7 +207,7 @@ function get_mime_type_from_filename($filename) {
 	if (strpos($filename, '.') !== false) {
 		$parts = explode('.', $filename);
 		$ext = end($parts);
-		$mimeType = getMimeType($ext);
+		$mimeType = get_mime_type($ext);
 	}
 	return $mimeType;
 }

@@ -2,7 +2,7 @@
 
 class SlabInternalsController extends AppController {
 	function rhps() {
-		return $this->physicalFile(SLAB_LIB.'/views/rhps.jpg');
+		return $this->physical_file(SLAB_LIB.'/views/rhps.jpg');
 	}
 	function show_exception() {
 		$this->set('ex', $this->data['ex']);
