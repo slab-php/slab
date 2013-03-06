@@ -60,7 +60,7 @@ class Controller extends Object {
 			$this->view->set_view($view);
 		}
 		if (isset($layout)) {
-			$this->view->setLayout($layout);
+			$this->view->set_layout($layout);
 		}
 		$this->actionResult = new ViewResult($this->view);
 	}
