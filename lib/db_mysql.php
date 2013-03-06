@@ -111,7 +111,7 @@ class DbMySql extends Database {
 
 		$this->query($sql);
 		
-		$this->id = $this->connection->insert_id();
+		$this->id = $this->connection->insert_id;
 		
 		return $this->id;
 	}
