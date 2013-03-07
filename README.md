@@ -210,7 +210,7 @@ Most of the html methods relate to creating inputs which can be a bit verbose. T
 
 The most used method is `url()`, which is the recommended method for producing a relative URL to either a controller action or a static file.
 
-#### url
+#### `url`
 `url($u)`: Wraps `dispatcher->url` which returns either a relative path to a static file or a path to a controller action, optionally using url rewriting for pretty, SEO friendly URLs if enabled (default), optionally including a session ID if the session ID is persisted via the URL.
 
 For example, if the site is hosted at `www.domain.com/some/application/`, `url('/pages/home')` may  return (depending on the environment):
@@ -222,10 +222,10 @@ For example, if the site is hosted at `www.domain.com/some/application/`, `url('
 
 If there exists a file at `www.domain.com/some/application/images/header.jpg`, `url('/images/header.jpg')` would return `/some/application/images/header.jpg`.
 
-#### markdown
+#### `markdown`
 `markdown($markdownText)`: passes the [Markdown](http://daringfireball.net/projects/markdown/) formatted input through [Markdown Extra](http://michelf.com/projects/php-markdown/) and returns the resultant HTML
 
-#### label
+#### `label`
 `label($forId, $value)`: Returns a HTML `label` element. Eg.:
 
     <p><?php e($html->label('data[name]', 'Name:')); ?></p>
@@ -234,7 +234,7 @@ results in:
 
 	<p><label for='data[name]'>Name:</label></p>
 
-#### input_hidden
+#### `input_hidden`
 `input_hidden($params)`: returns a hidden input element. Params is an array containing optionally `name`, `id` and `value`. Eg:
 
     <form><?php e($html->input_hidden(array(
@@ -247,7 +247,7 @@ results in:
 
 	<form><label type='hidden' name='data[name]' id='name_element' value='Steve' /></form>
 
-#### input, input_text, input_url, input_file
+#### `input`, `input_text`, `input_url`, `input_file`
 `input($params)` also `input_text` `input_url` and `input_file`: returns an input with an optional label. Params is an array containing optionally `name`, `id`, `value`, `label`, `type`. If `label` is not included or is null, no label will be output. The `input_text`, `input_url` and `input_file` methods include the `type` value. Eg:
 
     <form><?php e($html->input(array(
@@ -262,10 +262,10 @@ results in:
 
 	<form><label for='name_element'>Name:</label> <input type='text' name='data[name]' id='name_element' value='Adam' /></form>
 
-#### textarea
+#### `textarea`
 `textarea($params)`: returns a `textarea`. Params is an array containing optionally `name`, `id`, `value`, `label`, `rows` (default to 8) and `cols` (default to 80).
 
-#### select
+#### `select`
 `select($params)`: returns a `select` element. Params is an array containing optionally `name`, `id`, `options`, `current` and `label`. Eg:
 
 	<?php 
@@ -296,7 +296,7 @@ results in (reformatted):
     	</select>
     </p>
 
-#### select_int_from_range
+#### `select_int_from_range`
 `select_int_from_range($name, $id, $from, $to, $current)`: eg.:
 
     <?php e($html->select_int_from_range('age', 'age', 0, 100, 32)); ?>
@@ -310,10 +310,10 @@ results in (reformatted):
     	...
     </select>
 
-#### header_status
+#### `header_status`
 `header_status($code, $reason = null)`: Sets the HTTP header status. If the reason is not provided it uses a lookup table for standard HTTP status codes. Eg: `$html->header_status(501);` may result in `header('HTTP/1.1 501 Not Implemented');`.
 
-#### header_no_cache
+#### `header_no_cache`
 `header_no_cache()`: Writes the headers required to trigger `no-cache` for Internet Explorer.
 
 
@@ -336,7 +336,29 @@ Components are available in each controller's class-wide scope, so within a cont
 ### Cookie
 ### Db
 ### Email
+
 ### File
+#### `load_posted_file` / `read_posted_file`
+Reads a posted file to a byte buffer. A view might post to an action:
+
+    <form method="POST" action="<?php e($html->url('/files/upload')); ?>" enctype="multipart/form-data">
+		<input type="file" name="file"/>
+		<button type="submit">Upload</button>
+	</form>
+
+Then in the action:
+
+    class FilesController {
+    	function upload() {
+    		$filename = $this->data['file']['name'];
+			$fileData = $this->file->read_posted_file($this->data['file']);
+			$this->filesTable->save(array(
+				'filename' => $filename,
+				'data' => $fileData
+			));
+    	}
+    }
+
 ### Image
 ### Session
 
