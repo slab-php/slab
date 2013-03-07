@@ -63,52 +63,52 @@ Note that if you are trying to save UTF-8 text (eg copying and pasting from MS W
 		
 See [this StackOverflow question](http://stackoverflow.com/questions/4696499/meta-charset-utf-8-vs-meta-http-equiv-content-type) for some discussion around this issue.
 
-### get_last_error
+### `get_last_error`
 Returns the last error generated in the current database connection.
 
-### find / get / load
+### `find` / `get` / `load`
 `find($id = null, $fields = null)`: Find the first model using `$id` against the default primary field name. `$fields` is an optional parameter which is an array of fields to include in the resulting model. If the value for `$id` is not provided or is null, `$model->id` is used instead (**although this is not recommended and will be deprecated and removed (#16) in a future version**).
 
-### find_all / get_all / load_all
+### `find_all` / `get_all` / `load_all`
 `find_all($conditions = null, $fields = null, $order = null)`:
 
 - `$conditions` is an optional string containing the `WHERE` clause
 - `$fields` is an optional array of the field names to return
 - `$order` is an optional string containing the `ORDER BY` clause
 
-### find_all_by_query / get_all_by_query / load_all_by_query / query
+### `find_all_by_query` / `get_all_by_query` / `load_all_by_query` / `query`
 `find_all_by_query($sql)`: directly executes the SQL on the database and returns an array of hash arrays.
 
-### find_by / get_by / load_by
+### `find_by` / `get_by` / `load_by`
 `load_by($key, $val)`: Find the first model by the given key and value. If the `$key` and `$val` are arrays they are ANDed together: `load_by(array('key1', 'key2'), array(1, '2'))`. If no results are found returns `null`.
 
-### find_all_by / get_all_by / load_all_by
+### `find_all_by` / `get_all_by` / `load_all_by`
 `find_all_by($key, $val = null, $fields = null, $order = null)`: returns all models matching the given key and value. `$key` can also be an array of key/values, eg: `$model->find_all_by(array('name' => 'Ben', 'age' => '32))`.
 
-### find_first / get_first / load_first
+### `find_first` / `get_first` / `load_first`
 `find_first($conditions = null, $fields = null, $order = null)`: returns the first model matching the criteria. Eg:
 
     $foo = $fooModel->find_first('age < 16', '*', 'age DESC');
     // $foo is the first oldest foo under 16
 
-### save
+### `save`
 `save($data)`: saves the data to the database (in the configured table). If `$data` includes the primary field, performs an `UPDATE` otherwise performs an `INSERT` and returns the ID (the value of `mysql_insert_id()`).
 
-### update_field
+### `update_field`
 `update_field($id, $fieldName, $fieldData)`: updates a single field to the model identified by `$id`. Eg:
 
     $pageModel->update_field(16, 'content', $newContent);
 
-### remove / del / delete
+### `remove` / `del` / `delete`
 `remove($id)`: deletes the row with the given ID.
 
-### remove_all / del_all / delete_all
+### `remove_all` / `del_all` / `delete_all`
 `remove_all($conditions = null)`: deletes all rows that meet the given conditions (either a  string `WHERE` clause or an array of key/values which are `AND`ed together) or all rows if no condition is provided.
 
-### exists
+### `exists`
 `exists($conditions)`: returns whether one or more models exist in the database that satisfy the given conditions  - either a string `WHERE` clause or an `AND`ed key/value array.
 
-### count
+### `count`
 `count($conditions = null)`: returns the count of rows that satisfy the condition - either a string `WHERE` clause or an `AND`ed key/value array.
 
 
@@ -157,46 +157,55 @@ Sets the action result to a `PartialResult` which renders the view without a lay
 #### redirect($url)
 Sets the action result to a `RedirectResult` which redirects the client to the specified URL using a `302 FOUND` HTTP response.
 
-#### redirect_refresh($url)
+#### `redirect_refresh($url)`
 Sets the action result to a `RedirectRefreshResult` which sets a `Refresh` HTTP header which causes a browser redirection to the specified URL.
 
-#### text($s)
+#### `text($s)`
 Sets the action result to a `TextResult` which just returns the given string.
 
-#### json($o)
+#### `json($o)`
 Sets the action result to a `JsonResult` which returns the given object as a serialised JSON string using `json_encode`.
 
-#### file / file_inline($filename, $data, $encoding = 'binary')
+#### `file_inline($filename, $data, $encoding = 'binary')`
 Sets the action result to a `FileResult` which returns a file with the given filename and binary data type (by default) and an `inline` content disposition.
 
-#### file_attachment($filename, $data, $encoding = 'binary')
+#### `file_attachment($filename, $data, $encoding = 'binary')`
 Sets the action result to a `FileResult` which returns a file with the given file name and binary data type (by default) and an `attachment` content disposition. This causes the browser to open the file using the file save dialog ('What do you want to do with this file?' etc).
 
-#### ajax($statusCode, $data = null)
+This example assumes that you have a database table with an ID, a `name` column containing a filename, and a `data` column (`BLOB` or `LONGBLOB`, etc) containing binary data:
+
+	function get_file($id) {
+		$files = $this->dispatcher->load_model('files');
+    	$file = $files->get($id);
+        $this->file_attachment($file['name'], $file['data']);
+	}
+	// in a view, <a href="<?php e($html->url('/controller/get_file/3'); ?>">...
+
+#### `ajax($statusCode, $data = null)`
 Sets the action result to an `AjaxResult` which sets the specified HTTP status code and includes the optional data in the body of the response.
 
-#### ajax_success($data = null)
+#### `ajax_success($data = null)`
 Sets the action result to an `AjaxResult` with a HTTP status code of `200 OK` and includes the optional data in the body of the response.
 
-#### ajax_failure($data = null) / ajax_error($data = null)
+#### `ajax_failure($data = null) / ajax_error($data = null)`
 Sets the action result to an `AjaxResult` with a HTTP status code of `500 Internal Server Error` and includes the optional data in the body of the response.  
 
-#### file_not_found
+#### `file_not_found`
 Sets the action result to an `AjaxResult` with a HTTP status code of `404 Not Found`.
 
-#### action($cap, $data = null)
+#### `action($cap, $data = null)`
 Executes another action (via `$this->dispatcher->dispatch($cap, $data)`) and uses the result of that action for this action (nested dispatch).
 
-#### object_result($obj)
+#### `object_result($obj)`
 Sets the action result to an `ObjectResult` with the provided object data. This is not generally used for normal actions. Rather it would be used by a shared action that is only used via nested dispatch where a PHP object needs to be returned.
 
-#### controller_result($controller)
+#### `controller_result($controller)`
 Sets the action result to a `ControllerResult` containing the given controller (usually `$this`). This allows passing a full controller back to an action via a nested dispatch to allow really funky actions.
 
-#### physical_file($filename)
+#### `physical_file($filename)`
 Sets the action result to a `FileResult` containing the data read from the specified file. This is used to allow returning a physical file which would otherwise not be available via a `redirect` action. For example, returning `/etc/passwd` (which would be a **really bad idea**).
 
-#### redirect_immediate
+#### `redirect_immediate`
 Dirty way of redirecting by setting the location header then calling `die()` to terminate the script. Because this bypasses the Slab lifecycle this stops cookies from being saved etc.
 
 ## Helpers
@@ -205,7 +214,7 @@ Helpers are included directly in the scope of each view. There are two helpers: 
 
 	<p>Link to <a href="<?php e($html->url('/pages/help')); ?>">HELP</a></p>
 
-### HtmlHelper - $html
+### `HtmlHelper - $html`
 Most of the html methods relate to creating inputs which can be a bit verbose. These are most handy with the `select` statements where the options could come from a database, so it would save a lot of boilerplate code.
 
 The most used method is `url()`, which is the recommended method for producing a relative URL to either a controller action or a static file.
