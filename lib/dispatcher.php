@@ -4,9 +4,25 @@ class Dispatcher extends Object {
 	var $componentRefs = array();
 	var $helperRefs = array();
 	var $config = null;
+	var $__slug = '';
 
 	function __construct($config) {
 		$this->config = $config;
+	}
+
+	function set_slug($slug) {
+		$this->__slug = $slug;
+	}
+	function slug_is($slug) {
+		if (is_array($slug)) {
+			foreach ($slug as $s) {
+				if ($this->slug_is($s)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return $slug === $this->__slug;
 	}
 
 	function get_filename($filename) {

@@ -3,6 +3,7 @@
 ## A PHP5 framework.
 Slab is/was an MVC framework inspired by CakePHP and CodeIgniter, but I actually want to move away from the strict MVC paradigm and loosen it up.
 
+
 ## Views
 
 Views are PHP files that are included in the `View::__render` method. In the scope of the view a number of objects are available:
@@ -370,6 +371,30 @@ Then in the action:
 
 ### Image
 ### Session
+
+
+## Dispatcher
+The dispatcher is part of the lifecycle of a page request. The dispatcher is available:
+
+- in views in the local scope, as `$dispatcher`
+- in controllers in the class scope, as `$this->dispatcher`
+
+### Slugs
+Slugs are a way of identifying a page throughout the request. The slug can be set in a view or controller action:
+
+- in a view: `<?php $dispatcher->set_slug('contact'); ?>`
+- in the action: `function contact() { $this->dispatcher->set_slug('contact'); }`
+
+Then the slug can be used to control the layout via the `slug_is` function which returns a boolean:
+
+	<ul class="main-menu">
+		<li class="<?php e($dispatcher->slug_is('home') ? 'current' : ''); ?>">Home</li>
+		<li class="<?php e($dispatcher->slug_is('contact') ? 'current' : ''); ?>">Contact</li>
+	</ul>
+
+The `slug_is` function can optionally take an array where if the slug is in the array it will return true:
+
+	$dispatcher->slug_is(array('home, contact'))
 
 
 ## Examples
