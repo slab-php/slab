@@ -129,7 +129,7 @@ class DbMySql extends Database {
 	//   Returns a quoted and escaped string of $data for use in an SQL statement.
  	function make_value_safe($data, $column = null) {
 		if (empty($column)) {
-			$column = $this->introspectType($data);
+			$column = $this->introspect_type($data);
 		}
 
 		if ($data === null || (is_array($data) && empty($data))) {
@@ -164,6 +164,14 @@ class DbMySql extends Database {
 		}
 		
 		return "'" . $this->connection->real_escape_string($data) . "'";
+	}
+
+	function introspect_type($value) {
+		if ($value === true || $value === false) return 'boolean';
+		if (is_float($value) && floatval($value) === $value) return 'float';
+		if (is_int($value) && intval($value) === $value) return 'integer';
+		if (is_string($value) && strlen($value) > 255) return 'text';
+		return 'string';
 	}
 
 	function get_table_schema($tableName) {
