@@ -446,6 +446,10 @@ So the dispatcher would attempt a request to `/foo/bar/1` via:
 
 See the Bootstrap example application for an example plugin that sets up a [Twitter Bootstrap Carousel component](http://twitter.github.com/bootstrap/javascript.html#carousel).
 
+### Official plugins
+
+- [slab-plugin-lightbox2](https://github.com/swxben/slab-plugin-lightbox2) - based on [Lightbox 2](http://lokeshdhakar.com/projects/lightbox2/)
+
 
 ## Examples
 
