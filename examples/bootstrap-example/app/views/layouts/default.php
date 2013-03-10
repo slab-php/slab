@@ -37,6 +37,8 @@
 							<li><a href="<?php e($html->url('/test/hello_world')); ?>">Hello world</a></li>
 							<li><a href="<?php e($html->url('/test/hello_world_via_get')); ?>">Hello world via GET</a></li>
 							<li><a href="<?php e($html->url('/test/test_dispatch')); ?>">Test dispatch</a></li>
+							<li><a href="<?php e($html->url('/test/markdown_example')); ?>">Markdown example</a></li>
+							<li><a href="<?php e($html->url('/test/plugin_test')); ?>">Plugin test</a></li>
 						</ul>
 					</div>
 
@@ -45,6 +47,9 @@
 
 					<div class="hero-unit">
 						<h1>Bootstrap default layout</h1>
+					</div>
+
+					<div class="row-fluid">
 						<?php e($pageContent); ?>
 					</div>
 

@@ -36,17 +36,21 @@ class View extends Object {
 		
 		return $output;
 	}
-	
+
 	function __check_view_and_layout_filenames() {
 		// make sure the view file (and layout file if set) exist
 		if (!isset($this->viewFilename)) {
 			$this->viewFilename = SLAB_APP.'/views/'.$this->viewName.'.php';
 		}
 		if (!file_exists($this->viewFilename)) {
-			$pluginViewFilename = SLAB_LIB."/plugins/{$this->controllerName}/views/{$this->viewName}.php";
-			//throw new Exception($pluginViewFilename);
-			if (file_exists($pluginViewFilename)) {
-				$this->viewFilename = $pluginViewFilename;
+			$appPluginViewFilename = SLAB_APP."/plugins/{$this->controllerName}/views/{$this->viewName}.php";
+			if (file_exists($appPluginViewFilename)) {
+				$this->viewFilename = $appPluginViewFilename;
+			} else {
+				$slabPluginViewFilename = SLAB_LIB."/plugins/{$this->controllerName}/views/{$this->viewName}.php";
+				if (file_exists($slabPluginViewFilename)) {
+					$this->viewFilename = $slabPluginViewFilename;
+				}
 			}
 		}
 		if (!file_exists($this->viewFilename)) {

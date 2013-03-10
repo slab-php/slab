@@ -232,8 +232,17 @@ For example, if the site is hosted at `www.domain.com/some/application/`, `url('
 
 If there exists a file at `www.domain.com/some/application/images/header.jpg`, `url('/images/header.jpg')` would return `/some/application/images/header.jpg`.
 
-#### `markdown`
-`markdown($markdownText)`: passes the [Markdown](http://daringfireball.net/projects/markdown/) formatted input through [Markdown Extra](http://michelf.com/projects/php-markdown/) and returns the resultant HTML
+#### `markdown($markdownText)`
+Passes the [Markdown](http://daringfireball.net/projects/markdown/) formatted input through [Markdown Extra](http://michelf.com/projects/php-markdown/) and returns the resultant HTML. This is really cool within a view:
+
+	<?php e($html->markdown(<<<EOT
+	### Markdown example
+	[Markdown](http://daringfireball.net/projects/markdown) is supported directly inside a view using the `\$html` helper.
+	EOT
+	)); ?>
+	
+Note that `$` signs need to be escaped using `\$` within PHP's [heredoc syntax](http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc).
+	
 
 #### `label`
 `label($forId, $value)`: Returns a HTML `label` element. Eg.:
@@ -419,6 +428,23 @@ Alias for `count($a)`
 ### `uppercase($s)`, `toUpper($s)`, `uc($s)`, `up($s)`
 ### `uuid_secure()`
 
+
+## Plugins
+Plugins are sets of controllers, views, etc., that are bundled together under `/app/plugins`. There are some built-in plugins that are part of Slab - the main one being the `SlabInterals` controller which is used for 'pretty' error screens.
+
+The dispatcher resolves a controller in the following order:
+
+1. Within the application's controllers
+1. Within the application's plugins
+1. Within the built-in Slab plugins
+
+So the dispatcher would attempt a request to `/foo/bar/1` via:
+
+1. `app/controllers/foo_controller.php` -> `FooController::bar(1)`
+1. `app/plugins/foo/controllers/foo_controller.php` -> `FooController::bar(1)`
+1. `lib/plugins/foo/controllers/foo_controller.php` -> `FooController::bar(1)`
+
+See the Bootstrap example application for an example plugin that sets up a [Twitter Bootstrap Carousel component](http://twitter.github.com/bootstrap/javascript.html#carousel).
 
 
 ## Examples

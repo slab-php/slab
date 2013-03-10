@@ -1,6 +1,14 @@
 <?php
 
+require_once(SLAB_APP.'/services/gallery_service.php');
+
 class TestController extends AppController {
+	var $galleryService;
+
+	function before_filter() {
+		$this->galleryService = new GalleryService($this->disaptcher);
+	}
+
 	function index() {
 	}
 	
@@ -28,7 +36,12 @@ class TestController extends AppController {
 		$result = $this->dispatcher->dispatch('/test/hello_world');
 		$this->text('Testing dispatch: <pre>'.h($result->render_to_string()).'</pre>');
 	}
-	
+
+	function plugin_test() {
+		$this->set('items', $this->galleryService->get_items());
+	}
+
+	function markdown_example() {}
 }
 
 ?>
