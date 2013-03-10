@@ -2,13 +2,17 @@
 
 class PartialResult extends ActionResult {
 	var $view = null;
+	var $contentType = 'text/html';
 	
-	function __construct($view) {
+	function __construct($view, $contentType = 'text/html') {
 		$this->view = $view;
+		$this->contentType = $contentType;
 	}
-	
+
 	function render() {
-		e($this->renderToString());
+		header("Content-Type: $this->contentType");
+		
+		e($this->render_to_string());
 	}
 	
 	function render_to_string() {

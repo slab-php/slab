@@ -1,8 +1,4 @@
 <?php
-/*
-** Some of these are copied from CakePHP's basics.php
-*/
-
 function e($s) { echo($s); }
 function h($s) { return htmlspecialchars($s); }
 function html($s) { return htmlspecialchars($s); }
@@ -30,10 +26,10 @@ function pr($v) {
 
 // Returns if a given string $source contains the specified search string $search
 // If $search is an array, returns true if any of the items in $search is contained in $source
-function strContains($source, $search) {
+function str_contains($source, $search) {
 	if (is_array($search)) {
 		foreach ($search as $s) {
-			if (strContains($source, $s)) {
+			if (str_contains($source, $s)) {
 				return true;
 			}
 		}
@@ -203,13 +199,10 @@ function get_mime_type($ext) {
 }
 
 function get_mime_type_from_filename($filename) {
-	$mimeType = 'application/octet-stream';
-	if (strpos($filename, '.') !== false) {
-		$parts = explode('.', $filename);
-		$ext = end($parts);
-		$mimeType = get_mime_type($ext);
-	}
-	return $mimeType;
+	$baseName = basename($filename);
+	$parts = explode('.', $baseName);
+	$ext = end($parts);
+	return get_mime_type($ext);
 }
 
 

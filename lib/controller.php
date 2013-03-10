@@ -14,9 +14,9 @@ class Controller extends Object {
 	var $actionResult = null;
 	var $dispatcher = null;
 	
-	function __construct($dispatcher) {
+	function __construct($dispatcher, $controllerName) {
 		$this->dispatcher = $dispatcher;
-		$this->view = new View($this);
+		$this->view = new View($controllerName, $this);
 	
 		// get the methods used in the controller
 		$childMethods = get_class_methods($this);
@@ -65,9 +65,9 @@ class Controller extends Object {
 		$this->actionResult = new ViewResult($this->view);
 	}
 
-	function partial($view = null) {
+	function partial($view = null, $contentType = 'text/html') {
 		if (isset($view)) $this->view->setView($view);
-		$this->actionResult = new PartialResult($this->view);
+		$this->actionResult = new PartialResult($this->view, $contentType);
 	}
 
 	function redirect($url) {
@@ -124,7 +124,7 @@ class Controller extends Object {
 		$this->actionResult = new ControllerResult($controller);
 	}
 	function physical_file($filename) {
-		return $this->file_inline($filename, $this->file->read($filename));
+		return $this->file_inline(basename($filename), $this->file->read($filename));
 	}
 	
 	// This should only be used outside of a controller action as it is a dirty way of redirecting.

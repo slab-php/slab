@@ -175,17 +175,19 @@ class Dispatcher extends Object {
 		$inflector = new Inflector();
 
 		$className = $inflector->camelize($controllerName).'Controller';
-		if ($className == 'SlabInternalsController') {
-			$filename = SLAB_LIB.'/controllers/slab_internals_controller.php';
-		} else {
-			$filename = SLAB_APP.'/controllers/'.$controllerName.'_controller.php';
+		$filename = SLAB_APP."/controllers/{$controllerName}_controller.php";
+
+		if (!file_exists($filename)) {
+			// drop back to built-in plugins
+			$pluginFilename = SLAB_LIB."/plugins/{$controllerName}/controllers/{$controllerName}_controller.php";
+			if (file_exists($pluginFilename)) {
+				$filename = $pluginFilename;
+			}
 		}
 
 		if (!file_exists($filename)) {
 			throw new Exception("The {$className} controller could not be found at {$filename}");
 		}
-		
-		// TODO: fall back on plugins
 		
 		require_once($filename);
 		
@@ -193,7 +195,7 @@ class Dispatcher extends Object {
 			throw new Exception("The {$className} controller could not be loaded. Make sure the {$className} controller is defined at {$filename}");
 		}
 		
-		$controller = new $className($this);
+		$controller = new $className($this, $controllerName);
 		$this->__check_action($controller, $actionName);
 		
 		$controller->actionName = $actionName;

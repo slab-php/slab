@@ -152,7 +152,7 @@ Set the view's layout (calls `$this->view->set_layout()`).
 #### set_view($view = null, $layout = null)
 Sets the action result to view and optionally the layout. This is used as the default action result from an action.
 
-#### partial($view = null)
+#### partial($view = null, $contentType = 'text/html')
 Sets the action result to a `PartialResult` which renders the view without a layout.
 
 #### redirect($url)
@@ -397,6 +397,30 @@ The `slug_is` function can optionally take an array where if the slug is in the 
 	$dispatcher->slug_is(array('home, contact'))
 
 
+## Global functions
+Global functions are defined in `global_functions.php` and are mostly shortcuts for echo and escape operations. Some of the functions are based on similar functions in CakePHP and CodeIgniter.
+
+### `e($s)`
+### `eh($)`
+### `env($key)`
+### `get_mime_type($ext)`
+### `get_mime_type_from_filename($filename)`
+### `getMicrotime()`
+### `h($s)` / `html($s)`
+### `hex2rgb($hex)`
+
+### `length($a)`
+Alias for `count($a)`
+
+### `lowercase($s)`, `toLower($s)`, `lc($s)`, `low($s)`
+### `pr($s)`
+### `str_contains($s)`
+### `str_starts_with($s)`
+### `uppercase($s)`, `toUpper($s)`, `uc($s)`, `up($s)`
+### `uuid_secure()`
+
+
+
 ## Examples
 
 ### Bootstrap Breadcrumbs
@@ -443,15 +467,15 @@ This would result in something like:
 
 ## License
 
-Licensed under the Attribution-ShareAlike 3.0 Generic ([CC BY-SA 3.0][ccsa]) license.
+Licensed under the Attribution-ShareAlike 3.0 Generic ([CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/)) license.
 
 ### Third-party licenses
 
-#### [PHP Markdown & Extra][markdown_extra]
+#### [PHP Markdown & Extra](http://michelf.com/projects/php-markdown)
 Copyright (c) 2004-2009 Michel Fortin  
 All rights reserved.
 
-#### [Original Markdown][original_markdown]
+#### [Original Markdown](http://daringfireball.net/projects/markdown)
 Copyright (c) 2004-2006 John Gruber  
 All rights reserved.
 
@@ -460,13 +484,25 @@ Copyright 2012 Twitter, Inc
 Licensed under the Apache License v2.0  
 <http://www.apache.org/licenses/LICENSE-2.0>
 
+#### [CakePHP](http://cakephp.org/)
+Parts of Slab are based on, inspired by, or originally copied from CakePHP.  
+Copyright (c) Cake Software Foundation, Inc. (<http://cakefoundation.org>)  
+MIT License (<http://www.opensource.org/licenses/mit-license.php>)  
+
+#### [CodeIgniter](http://ellislab.com/codeigniter)
+Parts of Slab are based on, inspired by, or originally copied from CodeIgniter.  
+Copyright (c) 2008 - 2011, EllisLab, Inc.  
+<http://ellislab.com/codeigniter/user-guide/license.html>
+
+#### [Lightbox 2](http://lokeshdhakar.com/projects/lightbox2/)
+A modified copy of Lightbox 2 is included as a plug-in. It is intended that it will be [pulled out into a standalone plugin](https://github.com/swxben/slab/issues/26).  
+Licensed under the Creative Commons Attribution 2.5 License - <http://creativecommons.org/licenses/by/2.5/>
+
+
+
 #### Other third-party licenses
 
 May contain other third-party components under other licenses that I have missed, I will try to keep this up to date.
 
-
-[ccsa]: http://creativecommons.org/licenses/by-sa/3.0/
-[markdown_extra]: http://michelf.com/projects/php-markdown
-[original_markdown]: http://daringfireball.net/projects/markdown
 
 

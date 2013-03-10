@@ -6,13 +6,15 @@ class View extends Object {
 	var $layoutName = 'default';
 	var $layoutFilename = null;
 	var $controller = null;
+	var $controllerName = '';
 	var $data = array();		// this is set by the controller (either by $controller->view->data[] or $controller->set())
 	var $pageTitle = '';		// used by the layout, set by the controller or the view (which will override anything set by the controller as it runs after the action method)
 	
 	var $helperRefs = array();
 	
 	
-	function __construct($controller = null) {
+	function __construct($controllerName, $controller) {
+		$this->controllerName = $controllerName;
 		$this->controller = $controller;
 	}
 	
@@ -39,6 +41,13 @@ class View extends Object {
 		// make sure the view file (and layout file if set) exist
 		if (!isset($this->viewFilename)) {
 			$this->viewFilename = SLAB_APP.'/views/'.$this->viewName.'.php';
+		}
+		if (!file_exists($this->viewFilename)) {
+			$pluginViewFilename = SLAB_LIB."/plugins/{$this->controllerName}/views/{$this->viewName}.php";
+			//throw new Exception($pluginViewFilename);
+			if (file_exists($pluginViewFilename)) {
+				$this->viewFilename = $pluginViewFilename;
+			}
 		}
 		if (!file_exists($this->viewFilename)) {
 			e('<p>The <em>'.$this->viewName.'</em> view could not be found at <code>'.$this->viewFilename.'</code></p>');
