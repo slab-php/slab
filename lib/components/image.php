@@ -23,7 +23,7 @@ class ImageComponent extends Component {
 	}
 
 	// assuming JPEGs
-	function load image from file($filename) {
+	function load_image_from_file($filename) {
 		return imagecreatefromjpeg($filename);
 	}
 
