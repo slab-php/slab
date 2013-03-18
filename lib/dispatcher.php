@@ -184,6 +184,14 @@ class Dispatcher extends Object {
 		e($this->partial('/slab_internals/show_exception', array('ex' => $ex)));
 		die();
 	}
+
+	function &load_helper($helperName) {
+		return $this->controllerLoader->helperLoader->load_helper($helperName);
+	}
+
+	function &load_component($componentName) {
+		return $this->controllerLoader->componentLoader->load_component($componentName);
+	}
 };
 
 ?>

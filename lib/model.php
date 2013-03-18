@@ -51,6 +51,13 @@ class Model extends Object {
 	function get_all_by_query($sql) { return $this->database->query($sql); }
 	function load_all_by_query($sql) { return $this->database->query($sql); }
 	function query($q) { return $this->database->query($sql); }
+
+	function scalar($sql) {
+		$results = $this->query($sql);
+		if (!any($results)) return null;
+		if (!any($results[0])) return null;
+		return $results[0][0];
+	}
 	
 	// find the first model matching the conditions
 	function find_first($conditions=null, $fields=null, $order=null) { return $this->load_first($conditions, $fields, $order); }

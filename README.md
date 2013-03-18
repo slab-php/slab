@@ -59,7 +59,7 @@ The `Model` class in Slab is a wrapper around a simple database access layer. Ge
 Note that if you are trying to save UTF-8 text (eg copying and pasting from MS Word which includes so-called 'smart quotes') to a database table which is set up for UTF-8 collation the site needs include this in the `head`:
 
 	<head>
-		<meta charset='utf-8>
+		<meta charset='utf-8'>
 		...
 		
 See [this StackOverflow question](http://stackoverflow.com/questions/4696499/meta-charset-utf-8-vs-meta-http-equiv-content-type) for some discussion around this issue.
@@ -79,6 +79,9 @@ Returns the last error generated in the current database connection.
 
 ### `find_all_by_query` / `get_all_by_query` / `load_all_by_query` / `query`
 `find_all_by_query($sql)`: directly executes the SQL on the database and returns an array of hash arrays.
+
+### `scalar($sql)`
+Returns the first column of the first row returned by the query, or null if no rows or columns were returned.
 
 ### `find_by` / `get_by` / `load_by`
 `load_by($key, $val)`: Find the first model by the given key and value. If the `$key` and `$val` are arrays they are ANDed together: `load_by(array('key1', 'key2'), array(1, '2'))`. If no results are found returns `null`.
@@ -408,6 +411,9 @@ The `slug_is` function can optionally take an array where if the slug is in the 
 
 ## Global functions
 Global functions are defined in `global_functions.php` and are mostly shortcuts for echo and escape operations. Some of the functions are based on similar functions in CakePHP and CodeIgniter.
+
+### `any($val)`
+Returns true if the value is not null and has a count of more than 0. Kind of the reverse of `empty()` except that `!empty(1)` is true whereas `any(1)` is false.
 
 ### `e($s)`
 ### `eh($)`

@@ -1,4 +1,9 @@
 <?php
+
+function any($val) {
+	return !empty($val) && count($val) > 0;
+}
+
 function e($s) { echo($s); }
 function h($s) { return htmlspecialchars($s); }
 function html($s) { return htmlspecialchars($s); }
