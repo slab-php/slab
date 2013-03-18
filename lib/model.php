@@ -50,7 +50,7 @@ class Model extends Object {
 	function find_all_by_query($sql) { return $this->database->query($sql); }
 	function get_all_by_query($sql) { return $this->database->query($sql); }
 	function load_all_by_query($sql) { return $this->database->query($sql); }
-	function query($q) { return $this->database->query($sql); }
+	function query($sql) { return $this->database->query($sql); }
 
 	function scalar($sql) {
 		$results = $this->query($sql);
