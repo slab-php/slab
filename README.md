@@ -382,6 +382,13 @@ Then in the action:
     }
 
 ### Image
+#### `load_image_from_file($filename)`
+#### `get_posted_image($postImg)`
+#### `resize_image($source, $maxWidth, $maxHeight)`
+#### `resize_image_horizontal($source, $newWidth)`
+#### `resize_with_background($source, $width, $height, $hexRGB)`
+#### `save_image_to_in_memory_jpeg($img)`
+
 ### Session
 
 
