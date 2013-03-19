@@ -29,6 +29,8 @@ class ControllerLoader {
 	}
 
 	function &load_controller($controllerName, $actionName, $params, $data = null) {
+		$this->dispatcher->pageLogger->log('load_controller', 'start', "Controller: {$controllerName}");
+
 		$inflector = new Inflector();
 
 		$className = $inflector->camelize($controllerName).'Controller';
@@ -107,6 +109,8 @@ class ControllerLoader {
 			$controller->helperName =& $helper;
 			$controller->view->helperRefs[$helperName] =& $helper;
 		}
+
+		$this->dispatcher->pageLogger->log('load_controller', 'end', "Controller: {$controllerName}");
 
 		return $controller;
 	}

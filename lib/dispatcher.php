@@ -4,11 +4,13 @@ class Dispatcher extends Object {
 	var $componentRefs = array();
 	var $helperRefs = array();
 	var $config = null;
+	var $pageLogger = null;
 	var $__slug = '';
 	var $controllerLoader;
 
-	function __construct($config) {
+	function __construct($config, $pageLogger) {
 		$this->config = $config;
+		$this->pageLogger = $pageLogger;
 		$this->controllerLoader = new ControllerLoader($config, $this);
 	}
 
@@ -80,11 +82,15 @@ class Dispatcher extends Object {
 	// This has an optional $data param, this is an assoc array that is merged into the controller's data. This lets an action dispatch and
 	// return another action like: $this->actionResult = $this->dispatcher->dispatch('/c/a/p', array('key'=>'value'));
 	function dispatch($cap = null, $data = null) {
+		$this->pageLogger->log('dispatch', 'start', $cap);
+
 		$controller = $this->__inner_dispatch($cap, $data);
 		
 		if (empty($controller->actionResult)) {
 			$controller->set_view();
 		}
+
+		$this->pageLogger->log('dispatch', 'end', $cap);
 
 		return $controller->actionResult;
 	}
@@ -110,24 +116,26 @@ class Dispatcher extends Object {
 			die();
 		}
 
+		$this->pageLogger->log('inner_dispatch', 'start', "Route: {$cap}");
+
 		// get rid of the preceding '/'
 		if (strpos($cap, '/') === 0) {
 			$cap = substr($cap, 1);
 		}
 
 		// Extract the controller name, action name, and parameters from the cap
-		$cap = explode('/', $cap);
-		if (count($cap) >= 1) {
-			$controllerName = lowercase($cap[0]);
+		$route = explode('/', $cap);
+		if (count($route) >= 1) {
+			$controllerName = lowercase($route[0]);
 		}
-		if (count($cap) >= 2) {
-			$actionName = lowercase($cap[1]);
+		if (count($route) >= 2) {
+			$actionName = lowercase($route[1]);
 		}
 		if (empty($actionName)) {
 			$actionName = 'index';
 		}
-		if (count($cap) >= 3) {
-			$params = array_slice($cap, 2);
+		if (count($route) >= 3) {
+			$params = array_slice($route, 2);
 		}
 
 		// Load and create an instance of the controller
@@ -163,6 +171,8 @@ class Dispatcher extends Object {
 			$c->after_action();
 			$c->after_filter();
 		}
+
+		$this->pageLogger->log('inner_dispatch', 'end', "Route: {$cap}");
 
 		return $controller;
 	}

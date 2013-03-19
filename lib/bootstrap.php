@@ -2,8 +2,6 @@
 
 require_once(SLAB_LIB.'/global_functions.php');
 
-$SLAB_EXECUTION_TIME_START = getMicrotime();
-
 require_once(SLAB_LIB.'/object.php');
 require_once(SLAB_LIB.'/config.php');
 
@@ -13,6 +11,7 @@ if (!file_exists(SLAB_APP.'/config.php')) {
 require_once(SLAB_APP.'/config.php');
 
 // include classes
+require_once(SLAB_LIB.'/page_logger.php');
 require_once(SLAB_LIB.'/inflector.php');
 require_once(SLAB_LIB.'/dispatcher.php');
 require_once(SLAB_LIB.'/model.php');

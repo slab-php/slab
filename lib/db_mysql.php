@@ -1,6 +1,7 @@
 <?php
 
 class DbMySql extends Database {
+	var $dispatcher;
 	var $connection = null;
 	var $columnTypes = array(
 		'primary_key'	=> array('formatter' => 'intval'),
@@ -15,28 +16,45 @@ class DbMySql extends Database {
 		'blob'		=> array(),
 		'bool'		=> array('limit' => '1', 'default' => false)
 	);
+
+	function __construct($dispatcher) {
+		$this->dispatcher = $dispatcher;
+	}
 	
 	function connect() {
+		$this->dispatcher->pageLogger->log('dbmysql', 'connect', 'start');
+
 		if (!empty($this->connection)) {
 			$this->disconnect();
 		}
 
 		$this->port = empty($this->port) ? null : $this->port;
 		
+		$this->dispatcher->pageLogger->log('dbmysql', 'connect', 'connecting');
+
 		$this->connection = new mysqli(
-			$this->host,
+			"p:{$this->host}",
 			$this->login,
 			$this->password,
 			$this->database,
 			$this->port);
 
-		return $this->check_connection();
+		$this->dispatcher->pageLogger->log('dbmysql', 'connect', 'check connection');
+
+		$check = $this->check_connection();
+
+		$this->dispatcher->pageLogger->log('dbmysql', 'connect', 'end', "Check: {$check}");
+
+		return $check;
 	}
 	
 	function disconnect() {
-		if (empty($this->connection)) return;
-		$this->connection->close();
-		$this->connection = null;
+		$this->dispatcher->pageLogger->log('dbmysql', 'disconnect', 'start');
+		if (!empty($this->connection)) {
+			$this->connection->close();
+			$this->connection = null;
+		}
+		$this->dispatcher->pageLogger->log('dbmysql', 'disconnect', 'end');
 	}
 
 	function check_connection() {

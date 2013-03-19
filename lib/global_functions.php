@@ -18,7 +18,7 @@ function lc($s) { return strtolower($s); }
 function up($s) { return strtoupper($s); }
 function low($s) { return strtolower($s); }
 
-function getMicrotime() {
+function get_microtime() {
 	list($usec, $sec) = explode(' ', microtime());
 	return ((float)$usec + (float)$sec);
 }

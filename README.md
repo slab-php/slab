@@ -427,7 +427,7 @@ Returns true if the value is not null and has a count of more than 0. Kind of th
 ### `env($key)`
 ### `get_mime_type($ext)`
 ### `get_mime_type_from_filename($filename)`
-### `getMicrotime()`
+### `get_microtime()`
 ### `h($s)` / `html($s)`
 ### `hex2rgb($hex)`
 
@@ -462,6 +462,14 @@ See the Bootstrap example application for an example plugin that sets up a [Twit
 ### Official plugins
 
 - [slab-plugin-lightbox2](https://github.com/swxben/slab-plugin-lightbox2) - based on [Lightbox 2](http://lokeshdhakar.com/projects/lightbox2/)
+
+
+## PageLogger
+`PageLogger` is a very simple way of logging events throughout a page request. A page logger instance is created in the application's `slab.php` script, the `'slab_init'` event is logged, and the page logger is passed to the dispatcher:
+
+	$pageLogger->log('slab_init');
+
+This records the event at the current time (`get_microtime()`, in `global_functions.php`). The page logger is then passed to the dispatcher where it can be accessed at `$dispatcher->pageLogger`. Events can be logged at any point. Calling `$pageLogger->to_table()` returns the log as a HTML table. This could happen at the end of the site template if debugging is enabled (not currently part of Slab itself).
 
 
 ## Examples

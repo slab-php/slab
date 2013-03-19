@@ -14,6 +14,8 @@ class ComponentLoader {
 			return $this->dispatcher->componentRefs[$componentName];
 		}
 		
+		$this->dispatcher->pageLogger->log('component_loader', 'load_component', 'start', "Component: {$componentName}");
+
 		$componentFilename = SLAB_LIB.'/components/'.$componentName.'.php';
 		if (!file_exists($componentFilename)) {
 			throw new Exception("Unknown component {$componentName} at {$componentFilename}, only built-in components are now supported");
@@ -27,9 +29,11 @@ class ComponentLoader {
 			throw new Exception("The {$componentClass} component does not exist in {$componentFilename}");
 		}
 		
-		$component = new $componentClass($this->config);
+		$component = new $componentClass($this->config, $this->dispatcher);
 		$component->init();
 		$this->dispatcher->componentRefs[$componentName] =& $component;
+
+		$this->dispatcher->pageLogger->log('component_loader', 'load_component', 'end', "Component: {$componentName}");
 
 		return $component;
 	}
