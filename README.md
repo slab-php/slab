@@ -80,8 +80,15 @@ Returns the last error generated in the current database connection.
 ### `find_all_by_query` / `get_all_by_query` / `load_all_by_query` / `query`
 `find_all_by_query($sql)`: directly executes the SQL on the database and returns an array of hash arrays.
 
-### `scalar($sql)`
-Returns the first column of the first row returned by the query, or null if no rows or columns were returned.
+### `scalar($field, $conditions = null)`
+Returns the specified field of the first row of the results given the conditions or null if no rows  were returned.
+
+	$personsModel->scalar('MAX(age)', 'deleted = 0')
+
+is roughly:
+
+	SELECT MAX(age) FROM persons WHERE deleted = 0
+
 
 ### `find_by` / `get_by` / `load_by`
 `load_by($key, $val)`: Find the first model by the given key and value. If the `$key` and `$val` are arrays they are ANDed together: `load_by(array('key1', 'key2'), array(1, '2'))`. If no results are found returns `null`.
