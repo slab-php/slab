@@ -364,7 +364,43 @@ Components are available in each controller's class-wide scope, so within a cont
 
 ### Cookie
 ### Db
+
 ### Email
+The email component makes sending a formatted email relatively simple. The originating view will contain a form:
+
+    /app/views/contact/index.php:
+    	...
+    	<form action="<?php e($html->url('/contact/submit')); ?>">
+    		<input type="text" name="contact_email"/>
+    		<button type="submit">Send</button>
+    	</form>
+
+The `/contact/submit` action does the work of getting the content (by way of a partial view) and sending the email:
+
+    /app/controllers/contact_controller.php:
+    	...
+    	function submit() {
+    		$this->email->send(array(
+    			'to' => 'helloworld@swxben.com',
+    			'subject' => 'Contact form',
+    			'content' => $this->dispatcher->partial('/contact/_submit_email', array(
+    				'contactEmail' => $this->data['contact_email']
+    			))
+    		));
+    	}
+
+The partial view converts the input into a formatted email:
+
+	/app/controllers/contact_controller.php:
+		...
+		function _submit_email() {
+			$this->set($this->data);
+		}
+	/app/views/contact/_submit_email.php:
+		...
+		Email address: <?php eh($contactEmail); ?>
+		...
+
 
 ### File
 #### `load_posted_file` / `read_posted_file`
