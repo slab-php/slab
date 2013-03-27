@@ -401,6 +401,26 @@ The partial view converts the input into a formatted email:
 		Email address: <?php eh($contactEmail); ?>
 		...
 
+#### Email attachments
+Attachments are added to emails like so:
+
+	$this->email->send(array(
+		// ...
+		'attachments' => array(
+			'filename.pdf' => 0xDATA,
+			'filename2.pdf' => 0xDATA
+		)
+	));
+
+So in a controller action, a posted file could be added to an email using the `file` helper:
+
+	$this->email->send(array(
+		// ...
+		'attachments' => array(
+			$this->data['posted_file']['filename'] => $this->file->read_posted_file($this->data['posted_file'])
+		)
+	));
+
 
 ### File
 #### `load_posted_file` / `read_posted_file`
