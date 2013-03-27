@@ -423,6 +423,27 @@ So in a controller action, a posted file could be added to an email using the `f
 
 
 ### File
+#### `exists($filename)`
+#### `is_posted_file`
+Returns whether the POSTed value is a posted file. A view might post to an action:
+ 
+    <form method="POST" action="<?php e($html->url('/files/upload')); ?>" enctype="multipart/form-data">
+		<input type="file" name="file"/>
+		<button type="submit">Upload</button>
+	</form>
+
+Then in the action:
+
+	class FilesController extends AppController {
+		function upload() {
+			if ($this->file->is_uploaded_file($this->data['file'])) {
+				$this->text('A file was uploaded');
+			} else {
+				$this->text('No file was uploaded');
+			}
+		}
+	}
+
 #### `load_posted_file` / `read_posted_file`
 Reads a posted file to a byte buffer. A view might post to an action:
 
@@ -433,7 +454,7 @@ Reads a posted file to a byte buffer. A view might post to an action:
 
 Then in the action:
 
-    class FilesController {
+    class FilesController extends AppController {
     	function upload() {
     		$filename = $this->data['file']['name'];
 			$fileData = $this->file->read_posted_file($this->data['file']);
@@ -443,6 +464,17 @@ Then in the action:
 			));
     	}
     }
+
+#### `read` / `read_text`
+#### `write` / `write_text`
+#### `write_object($filename, $data, $mode = 'wb', $useEncryption = true)`
+#### `read_object($filename, $useEncryption = true)`
+
+#### `remove($filename)` / `delete($filename)`
+Wrappers for `unlink()`
+
+#### `dir($path, $filesOnly = false)`
+Get a directory listing of the path. This includes any subdirectories and returns the full path to each entry.
 
 ### Image
 #### `load_image_from_file($filename)`

@@ -11,6 +11,13 @@ class FileComponent extends Component {
 		return file_exists($filename);
 	}
 
+	function is_posted_file($postedFile) {
+		if (empty($postedFile)) return false;
+		if (!is_array($postedFile)) return false;
+		if (empty($postedFile['tmp_name'])) return false;
+		return is_uploaded_file($postedFile['tmp_name']);
+	}
+
 	function load_posted_file($postedFile) { return $this->read_posted_file($postedFile); }
 	function read_posted_file($postedFile) {
 		if (empty($postedFile)) {
@@ -90,9 +97,8 @@ class FileComponent extends Component {
 		return $data;
 	}
 	
-	// Wrapper for unlink()
 	function remove($filename) {
-		return $this->delete($filename);
+		return unlink($filename);
 	}
 	function delete($filename) {
 		return unlink($filename);
