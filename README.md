@@ -417,7 +417,7 @@ So in a controller action, a posted file could be added to an email using the `f
 	$this->email->send(array(
 		// ...
 		'attachments' => array(
-			$this->data['posted_file']['filename'] => $this->file->read_posted_file($this->data['posted_file'])
+			$this->data['posted_file']['name'] => $this->file->read_posted_file($this->data['posted_file'])
 		)
 	));
 
