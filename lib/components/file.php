@@ -104,9 +104,7 @@ class FileComponent extends Component {
 		return unlink($filename);
 	}
 	
-	// get a directory listing of the path. This includes any subdirectories and returns the full path to each entry
 	function dir($path, $filesOnly = false) {
-		// resolves the path to a canonicalized absolute path and make sure it ends with a directory separator
 		$path = rtrim(realpath($path), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		
 		$filenames = array_diff(scandir($path), array('.', '..'));
