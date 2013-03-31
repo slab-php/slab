@@ -610,6 +610,9 @@ This would result in something like:
 [Home](#) / [Widgets](#) / Viewing widget _sprocket_
 
 
+## Contribute
+
+If you want to contribute to this project, start by forking the repo. Create an issue if applicable, create a branch in your fork, and create a pull request when it's ready. Thanks!
 
 ## License
 

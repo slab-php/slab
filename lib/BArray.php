@@ -122,7 +122,7 @@ class BArray {
 	}
 	
 	function any($predicate = null) {
-		return $this->count($predicate);
+		return $this->count($predicate) !== 0;
 	}
 	function all($predicate = null) {
 		return $this->count($predicate) == $this->count();
