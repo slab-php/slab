@@ -618,6 +618,8 @@ If you want to contribute to this project, start by forking the repo. Create an 
 
 Licensed under the Attribution-ShareAlike 3.0 Generic ([CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/)) license.
 
+Slab includes [BArray](https://github.com/slab-php/barray), an array wrapper which is maintained outside of the Slab project but by the [slab-php](https://github.com/slab-php) organisation.
+
 ### Third-party licenses
 
 #### [PHP Markdown & Extra](http://michelf.com/projects/php-markdown)
