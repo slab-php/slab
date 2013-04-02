@@ -1,7 +1,14 @@
 <?php
 
-class DbMySql extends Database {
+class MySqlDatabaseDriver extends BaseDatabaseDriver {
 	var $dispatcher;
+	var $host;
+	var $login;
+	var $password;
+	var $database;
+	var $port;
+	var $tablePrefix;
+
 	var $connection = null;
 	var $columnTypes = array(
 		'primary_key'	=> array('formatter' => 'intval'),
@@ -17,8 +24,14 @@ class DbMySql extends Database {
 		'bool'		=> array('limit' => '1', 'default' => false)
 	);
 
-	function __construct($dispatcher) {
+	function __construct($dispatcher, $host, $port, $login, $password, $database, $tablePrefix) {
 		$this->dispatcher = $dispatcher;
+		$this->host = $host;
+		$this->login = $login;
+		$this->password = $password;
+		$this->database = $database;
+		$this->port = $port;
+		$this->tablePrefix = $tablePrefix;
 	}
 	
 	function connect() {

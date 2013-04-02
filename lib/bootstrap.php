@@ -22,12 +22,14 @@ require_once(SLAB_LIB.'/component.php');
 require_once(SLAB_LIB.'/component_loader.php');
 require_once(SLAB_LIB.'/helper.php');
 require_once(SLAB_LIB.'/helper_loader.php');
-require_once(SLAB_LIB.'/database.php');
 require_once(SLAB_LIB.'/security.php');
 require_once(SLAB_LIB.'/unit_test_case.php');
 require_once(SLAB_LIB.'/unit_test_suite.php');
 require_once(SLAB_LIB.'/BArray.php');
-// ActionResult and subclasses
+// Database drivers:
+require_once(SLAB_LIB.'/database_drivers/base_database_driver.php');
+require_once(SLAB_LIB.'/database_drivers/mysql_database_driver.php');
+// ActionResult and subclasses:
 require_once(SLAB_LIB.'/action_result.php');
 require_once(SLAB_LIB.'/view_result.php');
 require_once(SLAB_LIB.'/partial_result.php');

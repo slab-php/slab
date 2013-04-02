@@ -16,21 +16,19 @@ class DbComponent extends Component {
 		$this->db = null;
 		$driver = $this->config->get('db.driver');
 		if ($driver == 'mysql') {
-			$this->dispatcher->pageLogger->log('db_copmponent', 'load_driver', 'start', 'DbMySql');
-			require_once(SLAB_LIB.'/db_mysql.php');
-			$this->db = new DbMySql($this->dispatcher);
-			$this->dispatcher->pageLogger->log('db_component', 'load_driver', 'end', 'DbMySql');
+			$this->dispatcher->pageLogger->log('db_copmponent', 'load_driver', 'start', 'MySql');
+			$host = $this->config->get('db.host');
+			$port = $this->config->get('db.port');
+			$login = $this->config->get('db.login');
+			$password = $this->config->get('db.password');
+			$database = $this->config->get('db.database');
+			$tablePrefix = $this->config->get('db.tablePrefix');
+			$this->db = new MySqlDatabaseDriver($this->dispatcher, $host, $port, $login, $password, $database, $tablePrefix);
+			$this->dispatcher->pageLogger->log('db_component', 'load_driver', 'end', 'MySql');
 		}
 		// add other database drivers here
 		
 		if (!empty($this->db)) {
-			$this->db->host = $this->config->get('db.host');
-			$this->db->port = $this->config->get('db.port');
-			$this->db->login = $this->config->get('db.login');
-			$this->db->password = $this->config->get('db.password');
-			$this->db->database = $this->config->get('db.database');
-			$this->db->tablePrefix = $this->config->get('db.tablePrefix');
-
 			$this->dispatcher->pageLogger->log('db_component', 'connect', 'start');
 			if (!$this->db->connect()) {
 				$lastError = $this->get_last_error();
