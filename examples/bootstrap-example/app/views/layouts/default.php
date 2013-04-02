@@ -58,6 +58,8 @@
 
 			<footer>
 				<p><a href="http://swxben.com">Software by Ben Pty Ltd</a> | <a href="http://swxben.com">SWXBEN</a></p>
+				<?php e($dispatcher->pageLogger->to_table()); ?>
+			</footer>
 		</div>
 
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
