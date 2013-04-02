@@ -10,5 +10,7 @@
 	<?php e($pageContent); ?>
 	<p>-- content ends --</p>
 
+	<?php e($dispatcher->pageLogger->to_table()); ?>
+
 </body>
 </html>
