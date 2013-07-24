@@ -16,7 +16,7 @@ class ImageComponent extends Component {
 
 	function __construct($config) {
 		$this->config = $config;
-		ini_set('memory_limit', '64M');
+		ini_set('memory_limit', '128M');
 	}
 	
 	function init() {
@@ -34,8 +34,9 @@ class ImageComponent extends Component {
 		}
 		
 		$fileSize = $postImg['size'];
+		$filePath = $postImg['tmp_name'];
 		
-		if (!is_uploaded_file($postImg['tmp_name'])) {
+		if (!is_uploaded_file($filePath)) {
 			throw new Exception('Invalid uploaded file location');
 		}
 		$mimeType = $postImg['type'];
@@ -43,7 +44,30 @@ class ImageComponent extends Component {
 			throw new Exception('Invalid uploaded file type, only JPEG images are accepted');
 		}
 
-		return imagecreatefromjpeg($postImg['tmp_name']);
+		$image = imagecreatefromjpeg($filePath);
+		$image = $this->rotate_if_required($image, $filePath);
+
+		return $image;
+	}
+
+	function rotate_if_required($image, $filename) {
+		$exif = exif_read_data($filename);
+
+		if (!empty($exif['Orientation'])) {
+			switch ($exif['Orientation']) {
+				case 8:
+					return imagerotate($image, 90, 0);
+					break;
+				case 3:
+					return imagerotate($image, 180, 0);
+					break;
+				case 6:
+					return imagerotate($image, -90, 0);
+					break;
+			}
+		}
+
+		return $image;
 	}
 	
 	// returns a resized image, using the source image (a resource, returned by get_posted_image() for example)
