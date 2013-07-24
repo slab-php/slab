@@ -17,6 +17,11 @@ class Dispatcher extends Object {
 	function set_slug($slug) {
 		$this->__slug = $slug;
 	}
+
+	function get_slug() {
+		return $this->__slug;
+	}
+
 	function slug_is($slug) {
 		if (is_array($slug)) {
 			foreach ($slug as $s) {

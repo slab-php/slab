@@ -35,6 +35,18 @@ class FileComponent extends Component {
 		return $this->read($postedFile);
 	}
 
+	function store_file($sourcePath, $destinationKey) {
+		return $this->copy($sourcePath, $this->__get_stored_file_path($destinationKey));
+	}
+
+	function read_stored_file($destinationKey) {
+		return $this->read($this->__get_stored_file_path($destinationKey));
+	}
+
+	function __get_stored_file_path($destinationKey) {
+		return SLAB_APP.'/stored_files/'.sha1($destinationKey);
+	}
+
 	// Reads the file
 	function read($filename, $mode = 'rb') {
 		if (!$this->exists($filename)) {
@@ -100,8 +112,17 @@ class FileComponent extends Component {
 	function remove($filename) {
 		return unlink($filename);
 	}
+
 	function delete($filename) {
 		return unlink($filename);
+	}
+
+	function rename($source, $dest) {
+		return rename($source, $dest);
+	}
+
+	function copy($source, $dest) {
+		return copy($source, $dest);
 	}
 	
 	function dir($path, $filesOnly = false) {

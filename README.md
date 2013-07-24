@@ -73,9 +73,18 @@ Returns the last error generated in the current database connection.
 ### `find_all` / `get_all` / `load_all`
 `find_all($conditions = null, $fields = null, $order = null)`:
 
-- `$conditions` is an optional string containing the `WHERE` clause
+- `$conditions` is an optional string containing the `WHERE` clause, or an array of conditions that are `AND`ed together
 - `$fields` is an optional array of the field names to return
 - `$order` is an optional string containing the `ORDER BY` clause
+
+Both of these examples are functionally equivalent except that passing an array of conditions causes the field values to be escaped first:
+
+	$things = $model->find_all("user_id = ${id} AND deleted = 0");
+	$things = $model->find_all(array(
+		'user_id' => $id,
+		'deleted' => false
+	));
+
 
 ### `find_all_by_query` / `get_all_by_query` / `load_all_by_query` / `query`
 `find_all_by_query($sql)`: directly executes the SQL on the database and returns an array of hash arrays.
@@ -97,10 +106,12 @@ is roughly:
 `find_all_by($key, $val = null, $fields = null, $order = null)`: returns all models matching the given key and value. `$key` can also be an array of key/values, eg: `$model->find_all_by(array('name' => 'Ben', 'age' => '32))`.
 
 ### `find_first` / `get_first` / `load_first`
-`find_first($conditions = null, $fields = null, $order = null)`: returns the first model matching the criteria. Eg:
+`find_first($conditions = null, $fields = null, $order = null)`: returns the first model matching the criteria. `$conditions` is either a string containing the `WHERE` clause or an array of conditions that are `AND`ed together. Eg:
 
     $foo = $fooModel->find_first('age < 16', '*', 'age DESC');
     // $foo is the first oldest foo under 16
+    $foo = $fooModel->find_first(array('age' => 65), '*', 'surname');
+    // $foo is the first foo aged 65 by surname
 
 ### `save`
 `save($data)`: saves the data to the database (in the configured table). If `$data` includes the primary field, performs an `UPDATE` otherwise performs an `INSERT` and returns the ID (the value of `mysql_insert_id()`).
@@ -401,6 +412,14 @@ The partial view converts the input into a formatted email:
 		Email address: <?php eh($contactEmail); ?>
 		...
 
+The available settings that can be passed to `email->send` are:
+
+- `to`: the recipient address (either `mail@somewhere.com` or `A Person <mail@somewhere.com>`)
+- `from`: the sending address (either `mail@somewhere.com` or `A Person <mail@somewhere.com>`)
+- `subject`
+- `content`
+- `attachments`: an associative array, where the key is a filename and the value is the binary data of the attachment
+
 #### Email attachments
 Attachments are added to emails like so:
 
@@ -419,6 +438,15 @@ So in a controller action, a posted file could be added to an email using the `f
 		'attachments' => array(
 			$this->data['posted_file']['name'] => $this->file->read_posted_file($this->data['posted_file'])
 		)
+	));
+
+#### HTML formatted email
+The content type of the email can be set using the `'content_type'` setting. By default the content type is `text/plain`. HTML formatted email can be sent by setting the content type to `text/html`:
+
+	$this->email->send(array(
+		'to' => 'helloworld@swxben.com',
+		'content' => '<p><strong>HTML email</strong></p>',
+		'content_type' => 'text/html'
 	));
 
 
@@ -471,10 +499,30 @@ Then in the action:
 #### `read_object($filename, $useEncryption = true)`
 
 #### `remove($filename)` / `delete($filename)`
-Wrappers for `unlink()`
+Wrappers for `unlink()`.
 
 #### `dir($path, $filesOnly = false)`
 Get a directory listing of the path. This includes any subdirectories and returns the full path to each entry.
+
+#### `store_file($sourcePath, $destinationKey)`
+Copies the specified file (`$postedFile['tmp_name']` is typical) to `/app/stored_files/{hashed $destinationKey}`. Files can then be read using `read_stored_file($destinationKey)`, so just the key has to be stored in the database.
+
+#### `read_stored_file($destinationKey)`
+Returns the contents of a stored file (located at `/app/stored_files/{hashed $destinationKey}`). Use this in a controller like so:
+
+	function get_file($id) {
+		$id = (int)$id;
+		$data = $this->someModel->get($id);
+		$storedFileData = $this->file->read_stored_file($data['destination_key']);
+		$this->file_attachment($data['filename'], $storedFileData);
+	}
+
+#### `rename($source, $dest)`
+Wraps `rename()` which moves the file `$source` to `$dest`.
+
+#### `copy($source, $dest)`
+Wraps `copy()` which copies the file `$source` to `$dest`.
+
 
 ### Image
 #### `load_image_from_file($filename)`
@@ -510,6 +558,7 @@ The `slug_is` function can optionally take an array where if the slug is in the 
 
 	$dispatcher->slug_is(array('home, contact'))
 
+The slug can also be retrieved by calling `$dispatcher->get_slug()`.
 
 ## Global functions
 Global functions are defined in `global_functions.php` and are mostly shortcuts for echo and escape operations. Some of the functions are based on similar functions in CakePHP and CodeIgniter.

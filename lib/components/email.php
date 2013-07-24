@@ -25,12 +25,13 @@ class EmailComponent extends Component {
 	function init() {}
 
 	function send($settings) {
-		extract($settings);
-		if (!isset($to)) throw new Exception('To address was not provided');
-		if (!isset($subject)) $subject = '';
-		if (!isset($content)) $content = '';
-		if (!isset($from)) $from = $to;
-		if (!isset($attachments)) $attachments = array();
+		if (!isset($settings['to'])) throw new Exception('To address was not provided');
+		$to = $settings['to'];
+		$subject = isset($settings['subject']) ? $settings['subject'] : '';
+		$content = isset($settings['content']) ? $settings['content'] : '';
+		$from = isset($settings['from']) ? $settings['from'] : $to;
+		$attachments = isset($settings['attachments']) ? $settings['attachments'] : array();
+		$contentType = isset($settings['content_type']) ? $settings['content_type'] : 'text/plain';
 
 		if (!$this->__check_header_injection($content)) throw new Exception('Content contains an illegal email header');
 		if (!$this->__check_referer()) throw new Exception('Referer is invalid');
@@ -46,21 +47,21 @@ class EmailComponent extends Component {
 			
 		$content =
 			"--{$boundary}".PHP_EOL.
-			"Content-type:text/plain; charset=iso-8559-1".PHP_EOL.
+			"Content-type:{$contentType}; charset=iso-8559-1".PHP_EOL.
 			"Content-Transfer-Encoding: 7bit".PHP_EOL.
 			PHP_EOL.
 			$content.PHP_EOL.
 			PHP_EOL;
 			
-		foreach ($settings['attachments'] as $k => $v) {
-			$attachment = chunk_split(base64_encode($v));
+		foreach ($attachments as $filename => $data) {
+			$data = chunk_split(base64_encode($data));
 			$content .=
 				"--{$boundary}".PHP_EOL.
-				"Content-type: application/octet-stream; name=\"{$k}\"".PHP_EOL.
+				"Content-type: application/octet-stream; name=\"{$filename}\"".PHP_EOL.
 				"Content-Transfer-Encoding: base64".PHP_EOL.
-				"Content-Disposition: attachment; filename=\"{$k}\"".PHP_EOL.
+				"Content-Disposition: attachment; filename=\"{$filename}\"".PHP_EOL.
 				PHP_EOL.
-				$attachment.PHP_EOL.
+				$data.PHP_EOL.
 				PHP_EOL;				
 		}
 		
@@ -72,12 +73,10 @@ class EmailComponent extends Component {
 		}
 	}
 	
-	// check content for email header injection. The regex is copied from the intarwebz (http://snipplr.com/view/28723/check-for-email-header-injection/)
-	// cause I'm lazy.
 	function __check_header_injection($content) {
 		return !preg_match('/\b^to+(?=:)\b|^content-type:|^cc:|^bcc:|^from:|^subject:|^mime-version:|^content-transfer-encoding:/im', $content);
 	}
-	// check referrer (to deny cross-site posts)
+
 	function __check_referer() {
 		return !empty($_SERVER['HTTP_REFERER']) || !strContains($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']);
 	}

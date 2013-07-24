@@ -67,7 +67,7 @@ class ImageComponent extends Component {
 		$dest = $source;
 		if ($newWidth != $width || $newHeight != $height) {
 			$dest = imagecreatetruecolor($newWidth, $newHeight);
-			imagecopyresized($dest, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+			imagecopyresampled($dest, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 		}
 		
 		return $dest;
@@ -80,7 +80,7 @@ class ImageComponent extends Component {
 		$newHeight = ($newWidth / $width) * $height;		
 		
 		$dest = imagecreatetruecolor($newWidth, $newHeight);
-		imagecopyresized($dest, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		imagecopyresampled($dest, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 		
 		return $dest;
 	}
@@ -114,7 +114,7 @@ class ImageComponent extends Component {
 		$color = imagecolorallocate($dest, $r, $g, $b);
 		
 		imagefill($dest, 0, 0, $color);
-		imagecopyresized(
+		imagecopyresampled(
 			$dest, 
 			$source,
 			($width - $newWidth) / 2,	// dst_x
